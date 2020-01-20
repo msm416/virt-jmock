@@ -114,12 +114,17 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     public Object dispatch(Invocation invocation) throws Throwable {
         for (Expectation expectation : expectations) {
             if (expectation.matches(invocation)) {
-                InvocationExpectation invocationExpectation = ((InvocationExpectation)expectation);
-                if(invocationExpectation.getPerformanceModel() != null) {
-                    double sample = invocationExpectation.getPerformanceModel().sample();
-                    totalVirtualTime += sample;
-                    System.out.println("WE SAMPLED: " + sample);
+                try {
+                    InvocationExpectation invocationExpectation = ((InvocationExpectation)expectation);
+                    if(invocationExpectation.getPerformanceModel() != null) {
+                        double sample = invocationExpectation.getPerformanceModel().sample();
+                        totalVirtualTime += sample;
+                        System.out.println("WE SAMPLED: " + sample);
+                    }
+                } catch (Exception ignored) {
+
                 }
+
                 return expectation.invoke(invocation);
             }
         }
