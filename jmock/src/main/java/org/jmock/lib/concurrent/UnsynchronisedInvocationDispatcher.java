@@ -3,6 +3,7 @@ package org.jmock.lib.concurrent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.hamcrest.Description;
 import org.hamcrest.SelfDescribing;
@@ -16,7 +17,8 @@ import org.jmock.internal.StateMachine;
 public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher {
     private final Collection<Expectation> expectations;
     private final Collection<StateMachine> stateMachines;
-    private double totalVirtualTime = 0d;
+    private double singleVirtualTime = 0d;
+    private List<Double> multipleVirtualTimes;
 
     public UnsynchronisedInvocationDispatcher() {
         expectations = new ArrayList<Expectation>();
@@ -118,7 +120,7 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                     InvocationExpectation invocationExpectation = ((InvocationExpectation)expectation);
                     if(invocationExpectation.getPerformanceModel() != null) {
                         double sample = invocationExpectation.getPerformanceModel().sample();
-                        totalVirtualTime += sample;
+                        singleVirtualTime += sample;
                         System.out.println("WE SAMPLED: " + sample);
                     }
                 } catch (Exception ignored) {
@@ -133,8 +135,24 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     }
 
     @Override
-    public double totalVirtualTime(){
-        return totalVirtualTime;
+    public double getSingleVirtualTime(boolean resetVirtualTime){
+        double TVT = singleVirtualTime;
+
+        if(resetVirtualTime) {
+            singleVirtualTime = 0;
+        }
+
+        return TVT;
+    }
+
+    @Override
+    public void setMultipleVirtualTimes(List<Double> virtualTimes) {
+        this.multipleVirtualTimes = virtualTimes;
+    }
+
+    @Override
+    public List<Double> getMultipleVirtualTimes() {
+        return multipleVirtualTimes;
     }
 
 }

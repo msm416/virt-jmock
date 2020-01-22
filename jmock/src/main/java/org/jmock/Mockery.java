@@ -2,7 +2,6 @@ package org.jmock;
 
 import java.util.*;
 
-import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import org.hamcrest.Description;
 import org.hamcrest.SelfDescribing;
 import org.jmock.api.Expectation;
@@ -272,6 +271,16 @@ public class Mockery implements SelfDescribing {
             throw t;
         }
     }
+
+    public void repeat(int counter, Runnable procedure) {
+	    List<Double> virtualTimes = new ArrayList<>(counter);
+	    for(int i = 0; i < counter; i++) {
+	        procedure.run();
+            virtualTimes.add(getSingleVirtualTime(true));
+        }
+
+	    dispatcher.setMultipleVirtualTimes(virtualTimes);
+    }
     
     private ExpectationError mismatchDescribing(final ExpectationError e) {
         ExpectationError filledIn = new ExpectationError(e.getMessage(), new SelfDescribing() {
@@ -283,9 +292,19 @@ public class Mockery implements SelfDescribing {
         return filledIn;
     }
 
-    public double totalVirtualTime() {
-        System.out.println("Total virtual time: " + dispatcher.totalVirtualTime());
-	    return dispatcher.totalVirtualTime();
+    /**
+     * Get the virtual time of the previous call to checking.
+     * Boolean resetVirtualTime specifies if we want to reset the virtual time accumulated in dispatcher
+     * (resetVirtualTime should be true when reusing the same JUnitRuleMockery @Rule as context).
+     */
+    public double getSingleVirtualTime(boolean resetVirtualTime) {
+	    double TVT = dispatcher.getSingleVirtualTime(resetVirtualTime);
+        System.out.println("Total virtual time: " + TVT);
+	    return TVT;
+    }
+
+    public List<Double> getMultipleVirtualTimes(){
+        return dispatcher.getMultipleVirtualTimes();
     }
 
     private class MockObject implements Invokable, CaptureControl {
