@@ -9,9 +9,11 @@ import java.util.List;
 
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertThat;
+import static utilities.PerfStatistics.hasPercentile;
+
 import org.apache.commons.math3.distribution.NormalDistribution;
 
-public class BasicTest {
+public class RepeatTest {
     static final long USER_ID = 1111L;
     static final List<Long> FRIEND_IDS = Arrays.asList(2222L, 3333L, 4444L, 5555L);
 
@@ -19,9 +21,11 @@ public class BasicTest {
     public JUnitRuleMockery context = new JUnitRuleMockery();
 
     @Test
-    public void looksUpDetailsForEachFriend() {
+    public void repeatedlyLooksUpDetailsForEachFriend() {
         final SocialGraph socialGraph = context.mock(SocialGraph.class);
         final UserDetailsService userDetails = context.mock(UserDetailsService.class);
+
+        context.repeat(1000, () -> {
 
             context.checking(new Expectations() {{
                 exactly(1).of(socialGraph).query(USER_ID);
@@ -34,6 +38,8 @@ public class BasicTest {
 
             new ProfileController(socialGraph, userDetails).lookUpFriends(USER_ID);
 
-        assertThat(context.getSingleVirtualTime(true), lessThan(2000.0));
+        });
+
+        assertThat(context.getMultipleVirtualTimes(), hasPercentile(80, lessThan(2000.0)));
     }
 }
