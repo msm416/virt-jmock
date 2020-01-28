@@ -17,6 +17,7 @@ import org.jmock.internal.matcher.AllParametersMatcher;
 import org.jmock.syntax.MethodClause;
 import org.jmock.syntax.ParametersClause;
 import org.jmock.syntax.ReceiverClause;
+import utilities.distributions.Distribution;
 
 public class InvocationExpectationBuilder 
     implements ExpectationCapture, 
@@ -57,7 +58,7 @@ public class InvocationExpectationBuilder
         needsDefaultAction = false;
     }
 
-    public void setModel(AbstractRealDistribution distribution) {
+    public void setModel(Distribution distribution) {
         expectation.setPerformanceModel(distribution);
     }
     

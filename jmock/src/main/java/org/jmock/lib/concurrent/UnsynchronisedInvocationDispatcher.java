@@ -124,7 +124,7 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                         System.out.println("WE SAMPLED: " + sample);
                     }
                 } catch (Exception ignored) {
-
+                    // TODO: don't throw exception, rather verify the cast above
                 }
 
                 return expectation.invoke(invocation);
