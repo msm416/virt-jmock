@@ -4,7 +4,7 @@ import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
 
-/**
+/*
  * A Categorical Distribution is composed of a list of Distribution model, each
  * has a probability to be picked when sampling. Sum of probabilities must be 1.
  * <p>
@@ -23,7 +23,7 @@ import java.util.*;
  * <p>
  * Distribution distribution = new CategoricalDistr(modelsWithProbs);
  * distribution.sample();
- */
+*/
 
 public class CategoricalDistr implements Distribution {
 
