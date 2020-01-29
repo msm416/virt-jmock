@@ -9,9 +9,8 @@ import java.util.List;
 
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertThat;
-import static utilities.PerfStatistics.hasPercentile;
+import static utilities.distributions.PerfStatistics.hasPercentile;
 
-import org.apache.commons.math3.distribution.NormalDistribution;
 import utilities.distributions.NormalDistr;
 
 public class RepeatTest {
