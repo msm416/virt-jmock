@@ -13,13 +13,16 @@ public class ProfileController {
     }
 
     public void lookUpFriends(long userId) {
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
         List<Long> friendIds = socialGraph.query(userId);
         List<User> friends = new ArrayList<>();
-
-        //JavaTense.scale(400);
-        //for (long i = 0; i < 1000000000L; i++) {
-        //}
-        //JavaTense.reset();
 
         for (Long friendId : friendIds) {
             friends.add(userDetailsService.lookup(friendId));

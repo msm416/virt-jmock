@@ -9,6 +9,7 @@ import java.util.List;
 
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertThat;
+
 import org.apache.commons.math3.distribution.NormalDistribution;
 import utilities.distributions.NormalDistr;
 
@@ -24,17 +25,24 @@ public class BasicTest {
         final SocialGraph socialGraph = context.mock(SocialGraph.class);
         final UserDetailsService userDetails = context.mock(UserDetailsService.class);
 
-            context.checking(new Expectations() {{
-                exactly(1).of(socialGraph).query(USER_ID);
-                will(returnValue(FRIEND_IDS));
-                inTime(new NormalDistr(1000, 10));
-                exactly(4).of(userDetails).lookup(with(any(Long.class)));
-                will(returnValue(new User()));
-                inTime(new NormalDistr(100, 10));
-            }});
+        context.checking(new Expectations() {{
+            exactly(1).of(socialGraph).query(USER_ID);
+            will(returnValue(FRIEND_IDS));
+            inTime(new NormalDistr(1000, 10));
+            exactly(4).of(userDetails).lookup(with(any(Long.class)));
+            will(returnValue(new User()));
+            inTime(new NormalDistr(100, 10));
+        }});
 
-            new ProfileController(socialGraph, userDetails).lookUpFriends(USER_ID);
+        long startTime = System.currentTimeMillis();
+        new ProfileController(socialGraph, userDetails).lookUpFriends(USER_ID);
+        long endTime = System.currentTimeMillis();
 
-        assertThat(context.getSingleVirtualTime(true), lessThan(2000.0));
+        assertThat(context.getSingleVirtualTime(true)
+                        + (endTime - startTime)
+                        - context.getSingleRealTime(),
+                lessThan(2000.0 + 2000));
+
+
     }
 }

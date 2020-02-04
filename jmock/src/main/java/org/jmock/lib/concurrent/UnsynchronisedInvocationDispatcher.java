@@ -18,6 +18,8 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     private final Collection<Expectation> expectations;
     private final Collection<StateMachine> stateMachines;
     private double singleVirtualTime = 0d;
+    private double singleRealTime = 0d;
+
     private List<Double> multipleVirtualTimes;
 
     public UnsynchronisedInvocationDispatcher() {
@@ -127,7 +129,12 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                     // TODO: don't throw exception, rather verify the cast above
                 }
 
-                return expectation.invoke(invocation);
+                long startTime = System.currentTimeMillis();
+                Object obj =  expectation.invoke(invocation);
+                long endTime = System.currentTimeMillis();
+                System.out.println("WE TOOK (REAL EXECUTION TIME - mocked method): " + (endTime - startTime));
+                singleRealTime += endTime - startTime;
+                return obj;
             }
         }
 
@@ -155,4 +162,7 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
         return multipleVirtualTimes;
     }
 
+    public double getSingleRealTime() {
+        return singleRealTime;
+    }
 }
