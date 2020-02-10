@@ -10,6 +10,7 @@ import org.jmock.api.Invocation;
 import org.jmock.api.Invocation.ExpectationMode;
 import org.jmock.internal.matcher.MethodMatcher;
 import org.jmock.lib.action.VoidAction;
+import utilities.distributions.Distribution;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class InvocationExpectation implements Expectation {
     
 	private int invocationCount = 0;
 
-	private AbstractRealDistribution model;
+	private Distribution model;
 	
     public void setCardinality(Cardinality cardinality) {
         this.cardinality = cardinality;
@@ -77,11 +78,11 @@ public class InvocationExpectation implements Expectation {
         this.actionIsDefault = true;
     }
 
-    public void setPerformanceModel(AbstractRealDistribution model) {
+    public void setPerformanceModel(Distribution model) {
         this.model = model;
     }
 
-    public AbstractRealDistribution getPerformanceModel() {
+    public Distribution getPerformanceModel() {
         return model;
     }
     

@@ -25,6 +25,10 @@ public interface InvocationDispatcher extends SelfDescribing, ExpectationCollect
         return 0d;
     }
 
+    default double getSingleRealTime() {
+        return 0d;
+    }
+
     default void setMultipleVirtualTimes(List<Double> virtualTimes) {
     }
 

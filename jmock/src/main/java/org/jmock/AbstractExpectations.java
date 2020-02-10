@@ -9,6 +9,7 @@ import org.jmock.api.ExpectationCollector;
 import org.jmock.internal.*;
 import org.jmock.lib.action.*;
 import org.jmock.syntax.*;
+import utilities.distributions.Distribution;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -234,7 +235,7 @@ public abstract class AbstractExpectations implements ExpectationBuilder,
         currentBuilder().setAction(action);
     }
 
-    public void inTime(AbstractRealDistribution model) {
+    public void inTime(Distribution model) {
         currentBuilder().setModel(model);
     }
     
