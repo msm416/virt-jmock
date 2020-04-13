@@ -121,7 +121,8 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                 try {
                     InvocationExpectation invocationExpectation = ((InvocationExpectation)expectation);
                     if(invocationExpectation.getPerformanceModel() != null) {
-                        double sample = invocationExpectation.getPerformanceModel().sample();
+                        //double sample = invocationExpectation.getPerformanceModel().sample();
+                        double sample = invocationExpectation.getPerformanceModel().inverseF(Math.random());
                         singleVirtualTime += sample;
                         System.out.println("WE SAMPLED: " + sample);
                     }
@@ -132,7 +133,7 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                 long startTime = System.currentTimeMillis();
                 Object obj =  expectation.invoke(invocation);
                 long endTime = System.currentTimeMillis();
-                System.out.println("WE TOOK (REAL EXECUTION TIME - mocked method): " + (endTime - startTime));
+                //System.out.println("WE TOOK (REAL EXECUTION TIME - mocked method): " + (endTime - startTime));
                 singleRealTime += endTime - startTime;
                 return obj;
             }

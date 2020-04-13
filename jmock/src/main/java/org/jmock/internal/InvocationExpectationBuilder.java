@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import org.hamcrest.Matcher;
 import org.jmock.Sequence;
 import org.jmock.api.Action;
@@ -17,7 +16,7 @@ import org.jmock.internal.matcher.AllParametersMatcher;
 import org.jmock.syntax.MethodClause;
 import org.jmock.syntax.ParametersClause;
 import org.jmock.syntax.ReceiverClause;
-import utilities.distributions.Distribution;
+import umontreal.ssj.probdist.Distribution;
 
 public class InvocationExpectationBuilder 
     implements ExpectationCapture, 

@@ -1,6 +1,5 @@
 package org.jmock.internal;
 
-import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.IsAnything;
@@ -10,7 +9,7 @@ import org.jmock.api.Invocation;
 import org.jmock.api.Invocation.ExpectationMode;
 import org.jmock.internal.matcher.MethodMatcher;
 import org.jmock.lib.action.VoidAction;
-import utilities.distributions.Distribution;
+import umontreal.ssj.probdist.Distribution;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
