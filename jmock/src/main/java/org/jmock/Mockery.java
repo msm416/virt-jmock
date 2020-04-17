@@ -1,6 +1,16 @@
 package org.jmock;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
 import org.hamcrest.SelfDescribing;
@@ -27,6 +37,7 @@ import org.jmock.lib.CamelCaseNamingScheme;
 import org.jmock.lib.IdentityExpectationErrorTranslator;
 import org.jmock.lib.JavaReflectionImposteriser;
 import org.jmock.lib.concurrent.Synchroniser;
+import org.junit.runners.model.FrameworkMethod;
 
 
 /**
@@ -335,6 +346,33 @@ public class Mockery implements SelfDescribing {
             return imposteriser.imposterise(
                 new ObjectMethodExpectationBouncer(new InvocationToExpectationTranslator(capture, defaultAction)), 
                 mockedType);
+        }
+    }
+
+    public void writeHtml(FrameworkMethod method) {
+        //String tmpDir = System.getProperty("java.io.tmpdir");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss");
+        Path dirPath = Paths.get("target", dtf.format(LocalDateTime.now()));
+        if (!Files.exists(dirPath)) {
+            try {
+                Files.createDirectories(dirPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Path filePath = Paths.get(dirPath.toString(),
+                method.getDeclaringClass().getName() + "-" + method.getName() + ".html");
+        try {
+            BufferedReader brJs = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/d3.min.js")));
+            Files.write(Paths.get(dirPath.toString(), "d3.min.js"), brJs.lines().collect(Collectors.toList()));
+            BufferedReader brFront = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/front.html")));
+            List<String> frontLines = brFront.lines().collect(Collectors.toList());
+            frontLines.add("var data = " + getMultipleVirtualTimes() + ";");
+            Files.write(filePath, frontLines);
+            BufferedReader brBack = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/back.html")));
+            Files.write(filePath, brBack.lines().collect(Collectors.toList()), StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

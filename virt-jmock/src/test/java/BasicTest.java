@@ -41,7 +41,5 @@ public class BasicTest {
                         + (endTime - startTime)
                         - context.getSingleRealTime(),
                 lessThan(2000.0 + 2000));
-
-
     }
 }

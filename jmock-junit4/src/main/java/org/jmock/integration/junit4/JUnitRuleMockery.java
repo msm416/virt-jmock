@@ -46,6 +46,7 @@ public class JUnitRuleMockery extends JUnit4Mockery implements MethodRule {
                 prepare(target);
                 base.evaluate();
                 assertIsSatisfied();
+                writeHtml(method);
             }
 
             private void prepare(final Object target) {
