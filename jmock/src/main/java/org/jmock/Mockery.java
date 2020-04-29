@@ -310,13 +310,13 @@ public class Mockery implements SelfDescribing {
      */
     public double getSingleVirtualTime(boolean resetVirtualTime) {
 	    double TVT = dispatcher.getSingleVirtualTime(resetVirtualTime);
-        System.out.println("Total virtual time: " + TVT);
+        //System.out.println("Total virtual time: " + TVT);
 	    return TVT;
     }
 
     public double getSingleRealTime(){
         double TRT = dispatcher.getSingleRealTime();
-        System.out.println("Total real time for mocked methods: " + TRT);
+        //System.out.println("Total real time for mocked methods: " + TRT);
         return TRT;
     }
 

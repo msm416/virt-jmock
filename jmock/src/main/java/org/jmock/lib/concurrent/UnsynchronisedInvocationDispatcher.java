@@ -124,7 +124,7 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                         //double sample = invocationExpectation.getPerformanceModel().sample();
                         double sample = invocationExpectation.getPerformanceModel().inverseF(Math.random());
                         singleVirtualTime += sample;
-                        System.out.println("WE SAMPLED: " + sample);
+                        //System.out.println("WE SAMPLED: " + sample);
                     }
                 } catch (Exception ignored) {
                     // TODO: don't throw exception, rather verify the cast above
