@@ -11,7 +11,7 @@ var series = d3.stack()
 
 var color = d3.scaleOrdinal()
 .domain(series.map(d => d.key))
-.range(d3.schemeSpectral[series.length+1])
+.range(d3.schemeBrBG[series.length+2])
 .unknown("#ccc");
 
 x = d3.scaleBand()

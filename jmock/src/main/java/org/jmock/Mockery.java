@@ -366,7 +366,7 @@ public class Mockery implements SelfDescribing {
         if(dispatcher.getRepeatCounter() == 1) {
             return;
         }
-        //TODO: back.html +1 in var color. Is it right?
+        //TODO: back.html +2 in var color.
         //String tmpDir = System.getProperty("java.io.tmpdir");
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss");
         Path dirPath = Paths.get("target", dtf.format(LocalDateTime.now()));
@@ -386,17 +386,18 @@ public class Mockery implements SelfDescribing {
             List<String> frontLines = brFront.lines().collect(Collectors.toList());
             Map<String, List<Double>> mvtpc = dispatcher.getMultipleVirtualTimesPerComponent();
             List<Map<String, String>> data = new ArrayList<>();
-            for(int i = 0; i < 10; i++) {
+            int numOfBuckets = Math.min(50,dispatcher.getRepeatCounter());
+            for(int i = 0; i < numOfBuckets; i++) {
                 int finalI = i;
                 data.add(new HashMap() {{put("name", "bucket" + finalI);}});
             }
             for (Map.Entry<String, List<Double>> comp : mvtpc.entrySet()) {
-                String compName = "\"met" + comp.getKey().length() + "\"";
-                //TODO: String compName = "\"" + comp.getKey() + "\"";
+                //String compName = "\"met" + comp.getKey().length() + "\"";
+                String compName = "\"" + comp.getKey() + "\"";
                 List<Double> compSamples = comp.getValue();
                 double coef = ((double) compSamples.size()) / dispatcher.getRepeatCounter();
-                int bucketSize = compSamples.size() / 10;
-                for(int i = 0; i < 10; i++) {
+                int bucketSize = compSamples.size() / numOfBuckets;
+                for(int i = 0; i < numOfBuckets; i++) {
                     int avgCompSample = 0;
                     for (int j = (i * bucketSize); j < ((i + 1) * bucketSize); j++) {
                         avgCompSample += compSamples.get(j);
@@ -404,18 +405,6 @@ public class Mockery implements SelfDescribing {
                     data.get(i).put(compName, "" + ((avgCompSample/bucketSize) * coef));
                 }
             }
-//            data.add(new HashMap() {{
-//                put("name", "bucket1");
-//                put("met1", "5038433");
-//                put("met2", "5170341");
-//                put("met3", "5809455");
-//            }});
-//            data.add(new HashMap() {{
-//                put("name", "bucket2");
-//                put("met1", "2038433");
-//                put("met2", "2170341");
-//                put("met3", "4809455");
-//            }});
             List<String> columns = new ArrayList<>();
             frontLines.add("var data = " + "[");
             //frontLines.add("var data = " + data + ";");
