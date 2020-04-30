@@ -1,9 +1,6 @@
 package org.jmock.lib.concurrent;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.hamcrest.Description;
 import org.hamcrest.SelfDescribing;
@@ -18,9 +15,12 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     private final Collection<Expectation> expectations;
     private final Collection<StateMachine> stateMachines;
     private double singleVirtualTime = 0d;
+    private Map<String, List<Double>> singleVirtualTimePerComponent= new HashMap<>();
+
     private double singleRealTime = 0d;
 
     private List<Double> multipleVirtualTimes;
+    private Map<String, List<Double>> multipleVirtualTimesPerComponent;
 
     public UnsynchronisedInvocationDispatcher() {
         expectations = new ArrayList<Expectation>();
@@ -124,6 +124,13 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                         //double sample = invocationExpectation.getPerformanceModel().sample();
                         double sample = invocationExpectation.getPerformanceModel().inverseF(Math.random());
                         singleVirtualTime += sample;
+
+                        String methodName = invocation.getInvokedMethod().toString(); // TODO: determine right name ?????
+                        if(singleVirtualTimePerComponent.containsKey(methodName)) {
+                            singleVirtualTimePerComponent.get(methodName).add(sample);
+                        } else {
+                            singleVirtualTimePerComponent.put(methodName, new ArrayList() {{add(sample);}});
+                        }
                         //System.out.println("WE SAMPLED: " + sample);
                     }
                 } catch (Exception ignored) {
@@ -154,13 +161,34 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     }
 
     @Override
+    public Map<String, List<Double>> getSingleVirtualTimePerComponent(boolean resetVirtualTime){
+        Map<String, List<Double>> SVTPC = singleVirtualTimePerComponent;
+
+        if(resetVirtualTime) {
+            singleVirtualTimePerComponent = new HashMap<>();
+        }
+
+        return SVTPC;
+    }
+
+    @Override
     public void setMultipleVirtualTimes(List<Double> virtualTimes) {
         this.multipleVirtualTimes = virtualTimes;
     }
 
     @Override
+    public void setMultipleVirtualTimesPerComponent(Map<String, List<Double>> virtualTimesPerComponent) {
+        this.multipleVirtualTimesPerComponent = virtualTimesPerComponent;
+    }
+
+    @Override
     public List<Double> getMultipleVirtualTimes() {
         return multipleVirtualTimes;
+    }
+
+    @Override
+    public Map<String, List<Double>> getMultipleVirtualTimesPerComponent() {
+        return multipleVirtualTimesPerComponent;
     }
 
     public double getSingleRealTime() {

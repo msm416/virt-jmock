@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hamcrest.Description;
 import org.hamcrest.SelfDescribing;
@@ -285,12 +286,17 @@ public class Mockery implements SelfDescribing {
 
     public void repeat(int counter, Runnable procedure) {
 	    List<Double> virtualTimes = new ArrayList<>(counter);
+	    Map<String, List<Double>> virtualTimesPerComponent = new HashMap<>();
 	    for(int i = 0; i < counter; i++) {
 	        procedure.run();
             virtualTimes.add(getSingleVirtualTime(true));
+            getSingleVirtualTimePerComponent(true).forEach((k, v) -> virtualTimesPerComponent.merge(k, v,
+                    ((a,b) -> Stream.concat(a.stream(), b.stream())
+                            .collect(Collectors.toList()))));
         }
 
 	    dispatcher.setMultipleVirtualTimes(virtualTimes);
+	    dispatcher.setMultipleVirtualTimesPerComponent(virtualTimesPerComponent);
     }
     
     private ExpectationError mismatchDescribing(final ExpectationError e) {
@@ -314,6 +320,11 @@ public class Mockery implements SelfDescribing {
 	    return TVT;
     }
 
+    public Map<String, List<Double>> getSingleVirtualTimePerComponent(boolean resetVirtualTime) {
+        Map<String, List<Double>> SVTPC = dispatcher.getSingleVirtualTimePerComponent(resetVirtualTime);
+        return SVTPC;
+    }
+
     public double getSingleRealTime(){
         double TRT = dispatcher.getSingleRealTime();
         //System.out.println("Total real time for mocked methods: " + TRT);
@@ -322,6 +333,10 @@ public class Mockery implements SelfDescribing {
 
     public List<Double> getMultipleVirtualTimes(){
         return dispatcher.getMultipleVirtualTimes();
+    }
+
+    public Map<String, List<Double>> getMultipleVirtualTimesPerComponent(){
+        return dispatcher.getMultipleVirtualTimesPerComponent();
     }
 
     private class MockObject implements Invokable, CaptureControl {
