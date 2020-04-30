@@ -363,6 +363,9 @@ public class Mockery implements SelfDescribing {
     }
 
     public void writeHtml(FrameworkMethod method) {
+        if(dispatcher.getRepeatCounter() == 1) {
+            return;
+        }
         //TODO: back.html +1 in var color. Is it right?
         //String tmpDir = System.getProperty("java.io.tmpdir");
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss");
