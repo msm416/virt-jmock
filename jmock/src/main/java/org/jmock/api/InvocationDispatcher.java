@@ -48,4 +48,10 @@ public interface InvocationDispatcher extends SelfDescribing, ExpectationCollect
     default Map<String, List<Double>> getMultipleVirtualTimesPerComponent() {
         return new HashMap<>();
     }
+
+    default void setRepeatCounter(int repeatCounter){}
+
+    default int getRepeatCounter() {
+        return 1;
+    }
 }

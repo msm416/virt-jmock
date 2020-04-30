@@ -22,6 +22,8 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     private List<Double> multipleVirtualTimes;
     private Map<String, List<Double>> multipleVirtualTimesPerComponent;
 
+    private int repeatCounter = 1;
+
     public UnsynchronisedInvocationDispatcher() {
         expectations = new ArrayList<Expectation>();
         stateMachines = new ArrayList<StateMachine>();
@@ -193,5 +195,15 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
 
     public double getSingleRealTime() {
         return singleRealTime;
+    }
+
+    @Override
+    public void setRepeatCounter(int repeatCounter) {
+        this.repeatCounter = repeatCounter;
+    }
+
+    @Override
+    public int getRepeatCounter() {
+        return repeatCounter;
     }
 }
