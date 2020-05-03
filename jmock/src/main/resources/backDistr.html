@@ -1,7 +1,323 @@
 var list = document.getElementById('distrList');
 
-var entry = document.createElement('li');
-entry.appendChild(document.createTextNode("1"));
-list.appendChild(entry);
+for(i = 0; i < 5; i++) {
+var li = document.createElement('li');
+var entry = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+entry.setAttribute("width", "960");
+entry.setAttribute("height", "500");
+entry.id = "svg" + i;
+li.appendChild(entry);
+list.appendChild(li);
+}
+var data = [
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket0",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"997.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket1",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"404.0",
+name:"bucket2",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1002.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket3",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket4",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket5",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"996.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket6",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1003.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket7",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket8",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket9",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket10",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket11",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket12",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"380.0",
+name:"bucket13",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1000.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket14",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket15",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket16",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket17",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1000.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"408.0",
+name:"bucket18",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1002.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket19",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1002.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket20",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket21",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"996.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket22",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1003.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket23",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1001.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"388.0",
+name:"bucket24",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1000.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"404.0",
+name:"bucket25",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1000.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"404.0",
+name:"bucket26",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket27",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1004.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket28",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"995.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket29",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"404.0",
+name:"bucket30",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"995.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket31",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1003.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket32",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"996.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket33",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket34",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket35",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"997.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"388.0",
+name:"bucket36",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"388.0",
+name:"bucket37",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket38",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"995.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"400.0",
+name:"bucket39",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1001.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket40",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket41",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"384.0",
+name:"bucket42",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"996.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket43",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"997.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket44",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1002.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket45",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"999.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket46",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1001.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"392.0",
+name:"bucket47",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"1000.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket48",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+{
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":"396.0",
+name:"bucket49",
+"public abstract java.util.List example.classes.SocialGraph.query(long)":"998.0",
+},
+];
+var columns = ["public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "public abstract java.util.List example.classes.SocialGraph.query(long)"];
+var width = 960, height = 500;
 
+var margin = ({top: 10, right: 10, bottom: 20, left: 40});
+
+formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
+
+var series = d3.stack()
+.keys(columns)
+(data)
+.map(d => (d.forEach(v => v.key = d.key), d));
+
+var color = d3.scaleOrdinal()
+.domain(series.map(d => d.key))
+.range(d3.schemeBrBG[series.length+2])
+.unknown("#ccc");
+
+x = d3.scaleBand()
+.domain(data.map(d => d.name))
+.range([margin.left, width - margin.right])
+.padding(0.1);
+
+y = d3.scaleLinear()
+.domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
+.rangeRound([height - margin.bottom, margin.top]);
+
+xAxis = g => g
+.attr("transform", `translate(0,${height - margin.bottom})`)
+.call(d3.axisBottom(x).tickSizeOuter(0))
+.call(g => g.selectAll(".domain").remove());
+
+yAxis = g => g
+.attr("transform", `translate(${margin.left},0)`)
+.call(d3.axisLeft(y).ticks(null, "s"))
+.call(g => g.selectAll(".domain").remove());
+
+const svg = d3.select("#svg0").attr("viewBox", [0, 0, width, height]);
+
+svg.append("g")
+.selectAll("g")
+.data(series)
+.join("g")
+.attr("fill", d => color(d.key))
+.selectAll("rect")
+.data(d => d)
+.join("rect")
+.attr("x", (d, i) => x(d.data.name))
+.attr("y", d => y(d[1]))
+.attr("height", d => y(d[0]) - y(d[1]))
+.attr("width", x.bandwidth())
+.append("title")
+.text(d => `${d.data.name} ${d.key}
+${formatValue(d.data[d.key])}`);
+
+svg.append("g")
+.call(xAxis);
+
+svg.append("g")
+.call(yAxis);
 </script>
