@@ -366,20 +366,26 @@ public class Mockery implements SelfDescribing {
         if(dispatcher.getRepeatCounter() == 1) {
             return;
         }
+
         //TODO: back.html +2 in var color.
         //String tmpDir = System.getProperty("java.io.tmpdir");
         List<String> frontLines = new ArrayList<>();
 
-        Path filePath = writeTopSectionHTML(frontLines,
-                method.getDeclaringClass().getName() + "-" + method.getName() + ".html");
+        Class thisClass = getClass();
+
+        Path filePath = writeTopSectionHTML(
+                frontLines,
+                method.getDeclaringClass().getName() + "-" + method.getName() + ".html",
+                "/front.html",
+                thisClass);
 
         writeMidSectionHTML(frontLines, filePath);
 
-        writeBottomSectionHTML(filePath, "/back.html");
+        writeBottomSectionHTML(filePath, "/back.html", thisClass);
     }
 
-    private void writeBottomSectionHTML(Path filePath, String sectionPath) throws IOException {
-        BufferedReader brBack = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(sectionPath)));
+    private static void writeBottomSectionHTML(Path filePath, String sectionPath, Class currClass) throws IOException {
+        BufferedReader brBack = new BufferedReader(new InputStreamReader(currClass.getResourceAsStream(sectionPath)));
         Files.write(filePath, brBack.lines().collect(Collectors.toList()), StandardOpenOption.APPEND, StandardOpenOption.WRITE);
     }
 
@@ -427,7 +433,9 @@ public class Mockery implements SelfDescribing {
         Files.write(filePath, frontLines);
     }
 
-    private Path writeTopSectionHTML(List<String> frontLines, String htmlName) throws IOException {
+    private static Path writeTopSectionHTML(List<String> frontLines, String htmlName,
+                                            String sectionPath, Class thisClass) throws IOException {
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss");
         Path dirPath = Paths.get("target", dtf.format(LocalDateTime.now()));
         if (!Files.exists(dirPath)) {
@@ -439,9 +447,9 @@ public class Mockery implements SelfDescribing {
         }
         Path filePath = Paths.get(dirPath.toString(),
                 htmlName);
-        BufferedReader brJs = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/d3.min.js")));
+        BufferedReader brJs = new BufferedReader(new InputStreamReader(thisClass.getResourceAsStream("/d3.min.js")));
         Files.write(Paths.get(dirPath.toString(), "d3.min.js"), brJs.lines().collect(Collectors.toList()));
-        BufferedReader brFront = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/front.html")));
+        BufferedReader brFront = new BufferedReader(new InputStreamReader(thisClass.getResourceAsStream(sectionPath)));
         frontLines.addAll(brFront.lines().collect(Collectors.toList()));
         return filePath;
     }

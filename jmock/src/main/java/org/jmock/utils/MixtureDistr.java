@@ -1,4 +1,4 @@
-package org.jmock.integration.junit4.utils;
+package org.jmock.utils;
 
 import umontreal.ssj.probdist.ContinuousDistribution;
 

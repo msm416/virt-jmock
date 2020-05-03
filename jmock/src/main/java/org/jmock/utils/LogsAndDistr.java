@@ -1,4 +1,4 @@
-package org.jmock.integration.junit4.utils;
+package org.jmock.utils;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -39,7 +39,7 @@ public class LogsAndDistr {
 
         try {
             getBestDistributionFromEmpiricalData(
-                    getSamplesFromLog("jmock-junit4/src/main/java/org/jmock/integration/junit4/utils/logs.txt",
+                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
                             "lookupOnApiIngredientDetails"));
         } catch (Exception e) {
             e.printStackTrace();
