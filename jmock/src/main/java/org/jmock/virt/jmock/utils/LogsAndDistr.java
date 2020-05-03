@@ -39,7 +39,8 @@ public class LogsAndDistr {
 
         try {
             getBestDistributionFromEmpiricalData(
-                    getSamplesFromLog("logs.txt", "lookupOnApiIngredientDetails"));
+                    getSamplesFromLog("jmock/src/main/java/org/jmock/virt/jmock/utils/logs.txt",
+                            "lookupOnApiIngredientDetails"));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -362,7 +362,7 @@ public class Mockery implements SelfDescribing {
         }
     }
 
-    public void writeHtml(FrameworkMethod method) {
+    public void writeHtml(FrameworkMethod method) throws Exception {
         if(dispatcher.getRepeatCounter() == 1) {
             return;
         }
@@ -379,57 +379,53 @@ public class Mockery implements SelfDescribing {
         }
         Path filePath = Paths.get(dirPath.toString(),
                 method.getDeclaringClass().getName() + "-" + method.getName() + ".html");
-        try {
-            BufferedReader brJs = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/d3.min.js")));
-            Files.write(Paths.get(dirPath.toString(), "d3.min.js"), brJs.lines().collect(Collectors.toList()));
-            BufferedReader brFront = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/front.html")));
-            List<String> frontLines = brFront.lines().collect(Collectors.toList());
-            Map<String, List<Double>> mvtpc = dispatcher.getMultipleVirtualTimesPerComponent();
-            List<Map<String, String>> data = new ArrayList<>();
-            int numOfBuckets = Math.min(50,dispatcher.getRepeatCounter());
-            for(int i = 0; i < numOfBuckets; i++) {
-                int finalI = i;
-                data.add(new HashMap() {{put("name", "bucket" + finalI);}});
-            }
-            for (Map.Entry<String, List<Double>> comp : mvtpc.entrySet()) {
-                //String compName = "\"met" + comp.getKey().length() + "\"";
-                String compName = "\"" + comp.getKey() + "\"";
-                List<Double> compSamples = comp.getValue();
-                double coef = ((double) compSamples.size()) / dispatcher.getRepeatCounter();
-                int bucketSize = compSamples.size() / numOfBuckets;
-                for(int i = 0; i < numOfBuckets; i++) {
-                    int avgCompSample = 0;
-                    for (int j = (i * bucketSize); j < ((i + 1) * bucketSize); j++) {
-                        avgCompSample += compSamples.get(j);
-                    }
-                    data.get(i).put(compName, "" + ((avgCompSample/bucketSize) * coef));
-                }
-            }
-            List<String> columns = new ArrayList<>();
-            frontLines.add("var data = " + "[");
-            //frontLines.add("var data = " + data + ";");
-            for (Map<String, String> percentileContent : data) {
-                frontLines.add("{");
-                for (Map.Entry<String, String> entry : percentileContent.entrySet()) {
-                    String key = entry.getKey();
-                    String val = entry.getValue();
-                    if (columns.size() < percentileContent.size() - 1) {
-                        if (!key.equals("name")) {
-                            columns.add(key);
-                        }
-                    }
-                    frontLines.add(key + ":\"" + val + "\",");
-                }
-                frontLines.add("},");
-            }
-            frontLines.add("];");
-            frontLines.add("var columns = " + columns + ";");
-            Files.write(filePath, frontLines);
-            BufferedReader brBack = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/back.html")));
-            Files.write(filePath, brBack.lines().collect(Collectors.toList()), StandardOpenOption.APPEND, StandardOpenOption.WRITE);
-        } catch (IOException e) {
-            e.printStackTrace();
+        BufferedReader brJs = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/d3.min.js")));
+        Files.write(Paths.get(dirPath.toString(), "d3.min.js"), brJs.lines().collect(Collectors.toList()));
+        BufferedReader brFront = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/front.html")));
+        List<String> frontLines = brFront.lines().collect(Collectors.toList());
+        Map<String, List<Double>> mvtpc = dispatcher.getMultipleVirtualTimesPerComponent();
+        List<Map<String, String>> data = new ArrayList<>();
+        int numOfBuckets = Math.min(50,dispatcher.getRepeatCounter());
+        for(int i = 0; i < numOfBuckets; i++) {
+            int finalI = i;
+            data.add(new HashMap() {{put("name", "bucket" + finalI);}});
         }
+        for (Map.Entry<String, List<Double>> comp : mvtpc.entrySet()) {
+            //String compName = "\"met" + comp.getKey().length() + "\"";
+            String compName = "\"" + comp.getKey() + "\"";
+            List<Double> compSamples = comp.getValue();
+            double coef = ((double) compSamples.size()) / dispatcher.getRepeatCounter();
+            int bucketSize = compSamples.size() / numOfBuckets;
+            for(int i = 0; i < numOfBuckets; i++) {
+                int avgCompSample = 0;
+                for (int j = (i * bucketSize); j < ((i + 1) * bucketSize); j++) {
+                    avgCompSample += compSamples.get(j);
+                }
+                data.get(i).put(compName, "" + ((avgCompSample/bucketSize) * coef));
+            }
+        }
+        List<String> columns = new ArrayList<>();
+        frontLines.add("var data = " + "[");
+        //frontLines.add("var data = " + data + ";");
+        for (Map<String, String> percentileContent : data) {
+            frontLines.add("{");
+            for (Map.Entry<String, String> entry : percentileContent.entrySet()) {
+                String key = entry.getKey();
+                String val = entry.getValue();
+                if (columns.size() < percentileContent.size() - 1) {
+                    if (!key.equals("name")) {
+                        columns.add(key);
+                    }
+                }
+                frontLines.add(key + ":\"" + val + "\",");
+            }
+            frontLines.add("},");
+        }
+        frontLines.add("];");
+        frontLines.add("var columns = " + columns + ";");
+        Files.write(filePath, frontLines);
+        BufferedReader brBack = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/back.html")));
+        Files.write(filePath, brBack.lines().collect(Collectors.toList()), StandardOpenOption.APPEND, StandardOpenOption.WRITE);
     }
 
 }
