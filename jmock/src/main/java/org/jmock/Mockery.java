@@ -1,14 +1,8 @@
 package org.jmock;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,6 +32,7 @@ import org.jmock.lib.CamelCaseNamingScheme;
 import org.jmock.lib.IdentityExpectationErrorTranslator;
 import org.jmock.lib.JavaReflectionImposteriser;
 import org.jmock.lib.concurrent.Synchroniser;
+import org.jmock.utils.LogsAndDistr;
 import org.junit.runners.model.FrameworkMethod;
 
 
@@ -368,12 +363,11 @@ public class Mockery implements SelfDescribing {
         }
 
         //TODO: back.html +2 in var color.
-        //String tmpDir = System.getProperty("java.io.tmpdir");
         List<String> frontLines = new ArrayList<>();
 
-        Class thisClass = getClass();
+        Class thisClass = Mockery.class;
 
-        Path filePath = writeTopSectionHTML(
+        Path filePath = LogsAndDistr.writeTopSectionHTML(
                 frontLines,
                 method.getDeclaringClass().getName() + "-" + method.getName() + ".html",
                 "/front.html",
@@ -381,12 +375,10 @@ public class Mockery implements SelfDescribing {
 
         writeMidSectionHTML(frontLines, filePath);
 
-        writeBottomSectionHTML(filePath, "/back.html", thisClass);
-    }
+        // Important: Write the content from the sections below to the file
+        Files.write(filePath, frontLines);
 
-    private static void writeBottomSectionHTML(Path filePath, String sectionPath, Class currClass) throws IOException {
-        BufferedReader brBack = new BufferedReader(new InputStreamReader(currClass.getResourceAsStream(sectionPath)));
-        Files.write(filePath, brBack.lines().collect(Collectors.toList()), StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+        LogsAndDistr.writeBottomSectionHTML(filePath, "/back.html", thisClass);
     }
 
     private void writeMidSectionHTML(List<String> frontLines, Path filePath) throws IOException {
@@ -430,28 +422,6 @@ public class Mockery implements SelfDescribing {
         }
         frontLines.add("];");
         frontLines.add("var columns = " + columns + ";");
-        Files.write(filePath, frontLines);
-    }
-
-    private static Path writeTopSectionHTML(List<String> frontLines, String htmlName,
-                                            String sectionPath, Class thisClass) throws IOException {
-
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss");
-        Path dirPath = Paths.get("target", dtf.format(LocalDateTime.now()));
-        if (!Files.exists(dirPath)) {
-            try {
-                Files.createDirectories(dirPath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        Path filePath = Paths.get(dirPath.toString(),
-                htmlName);
-        BufferedReader brJs = new BufferedReader(new InputStreamReader(thisClass.getResourceAsStream("/d3.min.js")));
-        Files.write(Paths.get(dirPath.toString(), "d3.min.js"), brJs.lines().collect(Collectors.toList()));
-        BufferedReader brFront = new BufferedReader(new InputStreamReader(thisClass.getResourceAsStream(sectionPath)));
-        frontLines.addAll(brFront.lines().collect(Collectors.toList()));
-        return filePath;
     }
 
 }

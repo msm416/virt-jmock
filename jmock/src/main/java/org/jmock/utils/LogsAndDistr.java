@@ -3,6 +3,7 @@ package org.jmock.utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.jmock.Mockery;
 import umontreal.ssj.gof.GofStat;
 import umontreal.ssj.probdist.*;
 
@@ -12,13 +13,18 @@ import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class LogsAndDistr {
     public static void main(String[] args) {
@@ -37,11 +43,33 @@ public class LogsAndDistr {
 
 //        System.out.println(System.currentTimeMillis() - start);
 
+//        try {
+//            getBestDistributionFromEmpiricalData(
+//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                            "lookupOnApiIngredientDetails"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        writeDistributionSummaryHTML();
+    }
+
+    private static void writeDistributionSummaryHTML() {
+        List<String> frontLines = new ArrayList<>();
+
+        Class thisClass = Mockery.class;
+
         try {
-            getBestDistributionFromEmpiricalData(
-                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
-                            "lookupOnApiIngredientDetails"));
-        } catch (Exception e) {
+            Path filePath = LogsAndDistr.writeTopSectionHTML(
+                    frontLines,
+                     "abcd.html",
+                    "/front.html",
+                    thisClass);
+
+            Files.write(filePath, frontLines);
+
+            LogsAndDistr.writeBottomSectionHTML(filePath, "/back.html", thisClass);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -199,5 +227,31 @@ public class LogsAndDistr {
         }
 
         return distributionList.get(maxPvalIndex);
+    }
+
+    public static void writeBottomSectionHTML(Path filePath, String sectionPath, Class currClass) throws IOException {
+        BufferedReader brBack = new BufferedReader(new InputStreamReader(currClass.getResourceAsStream(sectionPath)));
+        Files.write(filePath, brBack.lines().collect(Collectors.toList()), StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+    }
+
+    public static Path writeTopSectionHTML(List<String> frontLines, String htmlName,
+                                           String sectionPath, Class thisClass) throws IOException {
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss");
+        Path dirPath = Paths.get("target", dtf.format(LocalDateTime.now()));
+        if (!Files.exists(dirPath)) {
+            try {
+                Files.createDirectories(dirPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Path filePath = Paths.get(dirPath.toString(),
+                htmlName);
+        BufferedReader brJs = new BufferedReader(new InputStreamReader(thisClass.getResourceAsStream("/d3.min.js")));
+        Files.write(Paths.get(dirPath.toString(), "d3.min.js"), brJs.lines().collect(Collectors.toList()));
+        BufferedReader brFront = new BufferedReader(new InputStreamReader(thisClass.getResourceAsStream(sectionPath)));
+        frontLines.addAll(brFront.lines().collect(Collectors.toList()));
+        return filePath;
     }
 }
