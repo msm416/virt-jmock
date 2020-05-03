@@ -43,18 +43,16 @@ public class LogsAndDistr {
 
 //        System.out.println(System.currentTimeMillis() - start);
 
-//        try {
-//            getBestDistributionFromEmpiricalData(
-//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
-//                            "lookupOnApiIngredientDetails"));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-        writeDistributionSummaryHTML();
+        try {
+            getBestDistributionFromEmpiricalData(
+                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+                            "lookupOnApiIngredientDetails"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private static void writeDistributionSummaryHTML() {
+    private static void writeDistributionSummaryHTML(List<ContinuousDistribution> distributionList) {
         List<String> frontLines = new ArrayList<>();
 
         Class thisClass = Mockery.class;
@@ -63,12 +61,12 @@ public class LogsAndDistr {
             Path filePath = LogsAndDistr.writeTopSectionHTML(
                     frontLines,
                      "abcd.html",
-                    "/front.html",
+                    "/frontDistr.html",
                     thisClass);
 
             Files.write(filePath, frontLines);
 
-            LogsAndDistr.writeBottomSectionHTML(filePath, "/back.html", thisClass);
+            LogsAndDistr.writeBottomSectionHTML(filePath, "/backDistr.html", thisClass);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -171,7 +169,6 @@ public class LogsAndDistr {
                     continue;
                 }
                 samples.add(Double.parseDouble(part));
-
             }
         }
         return samples;
@@ -226,6 +223,7 @@ public class LogsAndDistr {
             }
         }
 
+        writeDistributionSummaryHTML(distributionList);
         return distributionList.get(maxPvalIndex);
     }
 
