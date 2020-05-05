@@ -80,7 +80,7 @@ public class MixtureDistr extends ContinuousDistribution {
         }
 
         return (MixtureDistr)
-                (LogsAndDistr.getBestDistributionViaGoodnessToFitTest(data, mixtureDistributionList));
+                (LogsAndDistr.getBestDistributionViaGoodnessToFitTest(data, mixtureDistributionList, true));
 
     }
 

@@ -367,7 +367,7 @@ public class Mockery implements SelfDescribing {
 
         Class thisClass = Mockery.class;
 
-        Path filePath = LogsAndDistr.writeTopSectionHTML(
+        Path filePath = LogsAndDistr.writeFrontSectionHTML(
                 frontLines,
                 method.getDeclaringClass().getName() + "-" + method.getName() + ".html",
                 "/front.html",
@@ -378,7 +378,7 @@ public class Mockery implements SelfDescribing {
         // Important: Write the content from the sections below to the file
         Files.write(filePath, frontLines);
 
-        LogsAndDistr.writeBottomSectionHTML(filePath, "/back.html", thisClass);
+        LogsAndDistr.writeBackSectionHTML(filePath, "/back.html", thisClass);
     }
 
     private void writeMidSectionHTML(List<String> frontLines, Path filePath) throws IOException {

@@ -18,10 +18,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -52,24 +49,73 @@ public class LogsAndDistr {
         }
     }
 
-    private static void writeDistributionSummaryHTML(List<ContinuousDistribution> distributionList) {
+    private static void writeDistributionSummaryHTML(List<ContinuousDistribution> distributionList,
+                                                     double[] dataArray) {
         List<String> frontLines = new ArrayList<>();
 
         Class thisClass = Mockery.class;
 
         try {
-            Path filePath = LogsAndDistr.writeTopSectionHTML(
+            Path filePath = LogsAndDistr.writeFrontSectionHTML(
                     frontLines,
-                     "abcd.html",
+                    "abcd.html",
                     "/frontDistr.html",
                     thisClass);
 
+            LogsAndDistr.writeMidSection(frontLines, distributionList, dataArray);
+
             Files.write(filePath, frontLines);
 
-            LogsAndDistr.writeBottomSectionHTML(filePath, "/backDistr.html", thisClass);
+            LogsAndDistr.writeBackSectionHTML(filePath, "/backDistr.html", thisClass);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void writeMidSection(List<String> frontLines, List<ContinuousDistribution> distributionList,
+                                        double[] dataArray) {
+        //TODO: make buckets
+        dataArray = Arrays.copyOfRange(dataArray, 0, 50);
+
+        frontLines.add("var dataNested = [");
+
+        for (int i = 0; i < distributionList.size(); i++) {
+            ContinuousDistribution distribution = distributionList.get(i);
+            List<Double> samplesFromDistr = new ArrayList<>();
+            List<Double> over = new ArrayList<>();
+            List<Double> under = new ArrayList<>();
+            for (int j = 0; j < dataArray.length; j++) {
+                double sample = distribution.inverseF(Math.random());
+                double diff = sample - dataArray[i];
+                if (diff > 0) {
+                    over.add(diff);
+                    under.add(0.0);
+                    sample -= diff;
+                } else {
+                    over.add(0.0);
+                    under.add(-diff);
+                }
+                if (sample < 0.0) {
+                    System.out.println("Distribution " + distribution + " generated negative sample.");
+                    sample = 0.0;
+                }
+                samplesFromDistr.add(sample);
+            }
+            frontLines.add("[");
+            for (int j = 0; j < dataArray.length; j++) {
+                frontLines.add("{");
+                frontLines.add("\"distribution\":\"" + samplesFromDistr.get(j) + "\",");
+                frontLines.add("\"over\":\"" + over.get(j) + "\",");
+                frontLines.add("\"under\":\"" + under.get(j) + "\",");
+                frontLines.add("name:\"bucket" + j + "\"");
+                frontLines.add("},");
+            }
+            frontLines.add("],");
+        }
+
+        frontLines.add("];");
+
+        frontLines.add("var columns = [\"distribution\", \"over\", \"under\"];");
     }
 
     public static void runForSomeTimeAndGenerateLogsOnHeroku() throws InterruptedException,
@@ -189,7 +235,7 @@ public class LogsAndDistr {
 
         List<ContinuousDistribution> distributionList = getBestInstancesFromDistList(distributionClasses, dataArray);
 
-        return getBestDistributionViaGoodnessToFitTest(dataArray, distributionList);
+        return getBestDistributionViaGoodnessToFitTest(dataArray, distributionList, false);
     }
 
     private static List<ContinuousDistribution> getBestInstancesFromDistList(Class[] distributionClasses, double[] dataArray) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -207,7 +253,9 @@ public class LogsAndDistr {
         return distributionList;
     }
 
-    public static Distribution getBestDistributionViaGoodnessToFitTest(double[] dataArray, List<ContinuousDistribution> distributionList) {
+    public static Distribution getBestDistributionViaGoodnessToFitTest(double[] dataArray,
+                                                                       List<ContinuousDistribution> distributionList,
+                                                                       boolean isFindingBestMixtureDistr) {
         int distributionListLen = distributionList.size();
         double[][] sval = new double[distributionList.size()][3];
         double[][] pval = new double[distributionList.size()][3];
@@ -223,17 +271,19 @@ public class LogsAndDistr {
             }
         }
 
-        writeDistributionSummaryHTML(distributionList);
+        if (!isFindingBestMixtureDistr) {
+            writeDistributionSummaryHTML(distributionList, dataArray);
+        }
         return distributionList.get(maxPvalIndex);
     }
 
-    public static void writeBottomSectionHTML(Path filePath, String sectionPath, Class currClass) throws IOException {
+    public static void writeBackSectionHTML(Path filePath, String sectionPath, Class currClass) throws IOException {
         BufferedReader brBack = new BufferedReader(new InputStreamReader(currClass.getResourceAsStream(sectionPath)));
         Files.write(filePath, brBack.lines().collect(Collectors.toList()), StandardOpenOption.APPEND, StandardOpenOption.WRITE);
     }
 
-    public static Path writeTopSectionHTML(List<String> frontLines, String htmlName,
-                                           String sectionPath, Class thisClass) throws IOException {
+    public static Path writeFrontSectionHTML(List<String> frontLines, String htmlName,
+                                             String sectionPath, Class thisClass) throws IOException {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss");
         Path dirPath = Paths.get("target", dtf.format(LocalDateTime.now()));
