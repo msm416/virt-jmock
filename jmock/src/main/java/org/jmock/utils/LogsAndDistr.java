@@ -75,7 +75,10 @@ public class LogsAndDistr {
     private static void writeMidSection(List<String> frontLines, List<ContinuousDistribution> distributionList,
                                         double[] dataArray) {
         //TODO: make buckets
-        dataArray = Arrays.copyOfRange(dataArray, 0, 50);
+        assert(dataArray.length >= 50);
+        //dataArray = Arrays.copyOfRange(dataArray, 0, 50);
+        int nbOfBuckets = 50;
+        int bucketSize = dataArray.length / 50;
 
         frontLines.add("var dataNested = [");
 
@@ -84,9 +87,18 @@ public class LogsAndDistr {
             List<Double> samplesFromDistr = new ArrayList<>();
             List<Double> over = new ArrayList<>();
             List<Double> under = new ArrayList<>();
-            for (int j = 0; j < dataArray.length; j++) {
-                double sample = distribution.inverseF(Math.random());
-                double diff = sample - dataArray[i];
+            for (int j = 0; j < nbOfBuckets; j++) {
+                double sample = 0.0;
+                double dataArrayInBucket = 0.0;
+                for(int k = bucketSize * j; k < bucketSize * (j + 1); k++) {
+                    dataArrayInBucket += dataArray[k];
+                    sample += distribution.inverseF(Math.random());
+                }
+
+                sample /= bucketSize;
+                dataArrayInBucket /= bucketSize;
+
+                double diff = sample - dataArrayInBucket;
                 if (diff > 0) {
                     over.add(diff);
                     under.add(0.0);
@@ -102,7 +114,7 @@ public class LogsAndDistr {
                 samplesFromDistr.add(sample);
             }
             frontLines.add("[");
-            for (int j = 0; j < dataArray.length; j++) {
+            for (int j = 0; j < nbOfBuckets; j++) {
                 frontLines.add("{");
                 frontLines.add("\"distribution\":\"" + samplesFromDistr.get(j) + "\",");
                 frontLines.add("\"over\":\"" + over.get(j) + "\",");
