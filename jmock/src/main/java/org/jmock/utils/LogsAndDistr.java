@@ -53,20 +53,20 @@ public class LogsAndDistr {
                                                      double[] dataArray) {
         List<String> frontLines = new ArrayList<>();
 
-        Class thisClass = Mockery.class;
+        Class mockeryClass = Mockery.class;
 
         try {
             Path filePath = LogsAndDistr.writeFrontSectionHTML(
                     frontLines,
                     "abcd.html",
                     "/frontDistr.html",
-                    thisClass);
+                    mockeryClass);
 
             LogsAndDistr.writeMidSection(frontLines, distributionList, dataArray);
 
             Files.write(filePath, frontLines);
 
-            LogsAndDistr.writeBackSectionHTML(filePath, "/backDistr.html", thisClass);
+            LogsAndDistr.writeBackSectionHTML(filePath, "/backDistr.html", mockeryClass);
         } catch (IOException e) {
             e.printStackTrace();
         }
