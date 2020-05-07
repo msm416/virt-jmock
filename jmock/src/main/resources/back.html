@@ -58,30 +58,31 @@ svg.append("g")
 svg.append("g")
 .call(yAxis);
 
-// add legend
+<!--// add legend-->
 
-var sequentialScale = d3.schemeSpectral[series.length];
+<!--var sequentialScale = d3.schemeSpectral[series.length];-->
 
-svg.append("g")
-.attr("class", "legendSequential")
-.attr("transform", "translate(20,20)");
+<!--svg.append("g")-->
+<!--.attr("class", "legendSequential")-->
+<!--.attr("transform", "translate(20,20)");-->
 
-// var legendSequential = legend.color
-//     .shapeWidth(30)
-//     .cells(10)
-//     .orient("horizontal")
-//     .scale(sequentialScale);
+<!--// var legendSequential = legend.color-->
+<!--//     .shapeWidth(30)-->
+<!--//     .cells(10)-->
+<!--//     .orient("horizontal")-->
+<!--//     .scale(sequentialScale);-->
 
-svg.select(".legendSequential")
-.call(legend({
-color: d3.scaleSequential([0, 100], d3.interpolateViridis),
-title: "Temperature (°F)"
-}));
+<!--svg.select(".legendSequential")-->
+<!--.call(legend({-->
+<!--color: d3.scaleSequential([0, 100], d3.interpolateViridis),-->
+<!--title: "Temperature (°F)"-->
+<!--}));-->
 
-// svg.node()
-legend({
-color: d3.scaleSequential([0, 100], d3.interpolateViridis),
-title: "Temperature (°F)"
-})
+<!--// svg.node()-->
+<!--legend({-->
+<!--color: d3.scaleSequential([0, 100], d3.interpolateViridis),-->
+<!--title: "Temperature (°F)"-->
+<!--})-->
 
 </script>
+</html>

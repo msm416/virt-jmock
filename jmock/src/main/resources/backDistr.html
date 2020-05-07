@@ -1,6 +1,6 @@
 var list = document.getElementById('distrList');
 
-for(i = 0; i < 5; i++) {
+for(i = 0; i < dataNested.length; i++) {
 var li = document.createElement('li');
 var entry = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 entry.setAttribute("width", "960");
@@ -74,3 +74,4 @@ svg.append("g")
 .call(yAxis);
 }
 </script>
+</html>
