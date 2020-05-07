@@ -1,6 +1,5 @@
 package org.jmock;
 
-import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.*;
@@ -9,7 +8,7 @@ import org.jmock.api.ExpectationCollector;
 import org.jmock.internal.*;
 import org.jmock.lib.action.*;
 import org.jmock.syntax.*;
-import utilities.distributions.Distribution;
+import umontreal.ssj.probdist.Distribution;
 
 import java.util.ArrayList;
 import java.util.Collection;

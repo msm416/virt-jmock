@@ -1,9 +1,6 @@
 package org.jmock.lib.concurrent;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.hamcrest.Description;
 import org.hamcrest.SelfDescribing;
@@ -18,9 +15,14 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     private final Collection<Expectation> expectations;
     private final Collection<StateMachine> stateMachines;
     private double singleVirtualTime = 0d;
+    private Map<String, List<Double>> singleVirtualTimePerComponent= new HashMap<>();
+
     private double singleRealTime = 0d;
 
     private List<Double> multipleVirtualTimes;
+    private Map<String, List<Double>> multipleVirtualTimesPerComponent;
+
+    private int repeatCounter = 1;
 
     public UnsynchronisedInvocationDispatcher() {
         expectations = new ArrayList<Expectation>();
@@ -121,9 +123,17 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                 try {
                     InvocationExpectation invocationExpectation = ((InvocationExpectation)expectation);
                     if(invocationExpectation.getPerformanceModel() != null) {
-                        double sample = invocationExpectation.getPerformanceModel().sample();
+                        //double sample = invocationExpectation.getPerformanceModel().sample();
+                        double sample = invocationExpectation.getPerformanceModel().inverseF(Math.random());
                         singleVirtualTime += sample;
-                        System.out.println("WE SAMPLED: " + sample);
+
+                        String methodName = invocation.getInvokedMethod().toString(); // TODO: determine right name ?????
+                        if(singleVirtualTimePerComponent.containsKey(methodName)) {
+                            singleVirtualTimePerComponent.get(methodName).add(sample);
+                        } else {
+                            singleVirtualTimePerComponent.put(methodName, new ArrayList() {{add(sample);}});
+                        }
+                        //System.out.println("WE SAMPLED: " + sample);
                     }
                 } catch (Exception ignored) {
                     // TODO: don't throw exception, rather verify the cast above
@@ -132,7 +142,7 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                 long startTime = System.currentTimeMillis();
                 Object obj =  expectation.invoke(invocation);
                 long endTime = System.currentTimeMillis();
-                System.out.println("WE TOOK (REAL EXECUTION TIME - mocked method): " + (endTime - startTime));
+                //System.out.println("WE TOOK (REAL EXECUTION TIME - mocked method): " + (endTime - startTime));
                 singleRealTime += endTime - startTime;
                 return obj;
             }
@@ -153,8 +163,24 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     }
 
     @Override
+    public Map<String, List<Double>> getSingleVirtualTimePerComponent(boolean resetVirtualTime){
+        Map<String, List<Double>> SVTPC = singleVirtualTimePerComponent;
+
+        if(resetVirtualTime) {
+            singleVirtualTimePerComponent = new HashMap<>();
+        }
+
+        return SVTPC;
+    }
+
+    @Override
     public void setMultipleVirtualTimes(List<Double> virtualTimes) {
         this.multipleVirtualTimes = virtualTimes;
+    }
+
+    @Override
+    public void setMultipleVirtualTimesPerComponent(Map<String, List<Double>> virtualTimesPerComponent) {
+        this.multipleVirtualTimesPerComponent = virtualTimesPerComponent;
     }
 
     @Override
@@ -162,7 +188,22 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
         return multipleVirtualTimes;
     }
 
+    @Override
+    public Map<String, List<Double>> getMultipleVirtualTimesPerComponent() {
+        return multipleVirtualTimesPerComponent;
+    }
+
     public double getSingleRealTime() {
         return singleRealTime;
+    }
+
+    @Override
+    public void setRepeatCounter(int repeatCounter) {
+        this.repeatCounter = repeatCounter;
+    }
+
+    @Override
+    public int getRepeatCounter() {
+        return repeatCounter;
     }
 }
