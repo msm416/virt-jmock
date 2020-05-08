@@ -58,7 +58,7 @@ public class LogsAndDistr {
         try {
             Path filePath = LogsAndDistr.writeFrontSectionHTML(
                     frontLines,
-                    "abcd.html",
+                    "DistributionComparison.html",
                     "/frontDistr.html",
                     mockeryClass);
 
