@@ -1,13 +1,51 @@
 var list = document.getElementById('distrList');
 
 for(i = 0; i < dataNested.length; i++) {
-var li = document.createElement('li');
-var entry = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-entry.setAttribute("width", "960");
-entry.setAttribute("height", "500");
-entry.id = "svg" + i;
-li.appendChild(entry);
-list.appendChild(li);
+
+    var li = document.createElement('li');
+    var container = document.createElement('div');
+    var row = document.createElement('div');
+    var col_1 = document.createElement('div');
+    var col_2 = document.createElement('div');
+    var entry = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    var par_name = document.createElement('P');
+    var par_totalOver = document.createElement('P');
+    var par_avgOver = document.createElement('P');
+    var par_totalUnder = document.createElement('P');
+    var par_avgUnder = document.createElement('P');
+
+    container.setAttribute("class", "container");
+    row.setAttribute("class", "row");
+    col_1.setAttribute("class", "col-md-auto");
+    col_2.setAttribute("class", "col-md-auto");
+    entry.setAttribute("width", "960");
+    entry.setAttribute("height", "500");
+    entry.id = "svg" + i;
+    par_name.innerText = distributionInfo[i].name;
+    par_name.setAttribute("style", "font-weight: bold");
+    par_totalOver.setAttribute("style", "color:green;");
+    par_totalOver.innerText = "Total Over: " + distributionInfo[i].totalOver;
+    par_avgOver.setAttribute("style", "color:green;");
+    par_avgOver.innerText = "Average Over: " + (distributionInfo[i].totalOver / nbOfBuckets);
+    par_totalUnder.setAttribute("style", "color:red;");
+    par_totalUnder.innerText = "Total Under: " + distributionInfo[i].totalUnder;
+    par_avgUnder.setAttribute("style", "color:red;");
+    par_avgUnder.innerText = "Average Under: " + (distributionInfo[i].totalUnder / nbOfBuckets);
+
+    list.appendChild(li);
+    li.appendChild(container);
+    container.appendChild(row);
+    row.appendChild(col_1);
+    row.appendChild(col_2);
+    col_1.appendChild(entry);
+    col_2.appendChild(par_name);
+    col_2.appendChild(par_totalOver);
+    col_2.appendChild(par_avgOver);
+    col_2.appendChild(par_totalUnder);
+    col_2.appendChild(par_avgUnder);
+
+<!--li.appendChild(entry);-->
+<!--list.appendChild(li);-->
 }
 
 var width = 960, height = 500;

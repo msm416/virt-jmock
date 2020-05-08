@@ -75,10 +75,14 @@ public class LogsAndDistr {
     private static void writeMidSection(List<String> frontLines, List<ContinuousDistribution> distributionList,
                                         double[] dataArray) {
         //TODO: make buckets
-        assert(dataArray.length >= 50);
+        int n = dataArray.length;
+        assert (n >= 50);
         //dataArray = Arrays.copyOfRange(dataArray, 0, 50);
         int nbOfBuckets = 50;
-        int bucketSize = dataArray.length / 50;
+        int bucketSize = n / 50;
+
+        double[] totalOver = new double[n];
+        double[] totalUnder = new double[n];
 
         frontLines.add("var dataNested = [");
 
@@ -90,7 +94,7 @@ public class LogsAndDistr {
             for (int j = 0; j < nbOfBuckets; j++) {
                 double sample = 0.0;
                 double dataArrayInBucket = 0.0;
-                for(int k = bucketSize * j; k < bucketSize * (j + 1); k++) {
+                for (int k = bucketSize * j; k < bucketSize * (j + 1); k++) {
                     dataArrayInBucket += dataArray[k];
                     sample += distribution.inverseF(Math.random());
                 }
@@ -103,9 +107,13 @@ public class LogsAndDistr {
                     over.add(diff);
                     under.add(0.0);
                     sample -= diff;
+
+                    totalOver[i] += diff;
                 } else {
                     over.add(0.0);
                     under.add(-diff);
+
+                    totalUnder[i] -= diff;
                 }
                 if (sample < 0.0) {
                     System.out.println("Distribution " + distribution + " generated negative sample.");
@@ -126,6 +134,19 @@ public class LogsAndDistr {
         }
 
         frontLines.add("];");
+
+        frontLines.add("var distributionInfo = [");
+        for (int i = 0; i < distributionList.size(); i++) {
+            frontLines.add("{");
+            frontLines.add("name:\"" + distributionList.get(i).toString() + "\"");
+            frontLines.add(",\"totalOver\":\"" + totalOver[i] + "\"");
+            frontLines.add(",\"totalUnder\":\"" + totalUnder[i] + "\"");
+            frontLines.add(",\"totalDiff\":\"" + (totalOver[i] - totalUnder[i]) + "\"");
+            frontLines.add("},");
+        }
+        frontLines.add("];");
+
+        frontLines.add("var nbOfBuckets = \"" + nbOfBuckets + "\"");
 
         frontLines.add("var columns = [\"distribution\", \"over\", \"under\"];");
     }
