@@ -86,15 +86,20 @@ public class LogsAndDistr {
 
         for (int i = 0; i < distributionList.size(); i++) {
             ContinuousDistribution distribution = distributionList.get(i);
-            List<Double> samplesFromDistr = new ArrayList<>();
+            double[] samplesFromDistr = new double[n];
+            List<Double> samplesFromDistrBuckets = new ArrayList<>();
             List<Double> over = new ArrayList<>();
             List<Double> under = new ArrayList<>();
+            for(int j = 0; j < n; j++) {
+                samplesFromDistr[j] = distribution.inverseF(Math.random());
+            }
+
             for (int j = 0; j < nbOfBuckets; j++) {
                 double sample = 0.0;
                 double dataArrayInBucket = 0.0;
                 for (int k = bucketSize * j; k < bucketSize * (j + 1); k++) {
                     dataArrayInBucket += dataArray[k];
-                    sample += distribution.inverseF(Math.random());
+                    sample += samplesFromDistr[k];
                 }
 
                 sample /= bucketSize;
@@ -117,12 +122,12 @@ public class LogsAndDistr {
                     System.out.println("Distribution " + distribution + " generated negative sample.");
                     sample = 0.0;
                 }
-                samplesFromDistr.add(sample);
+                samplesFromDistrBuckets.add(sample);
             }
             frontLines.add("[");
             for (int j = 0; j < nbOfBuckets; j++) {
                 frontLines.add("{");
-                frontLines.add("\"distribution\":\"" + samplesFromDistr.get(j) + "\",");
+                frontLines.add("\"distribution\":\"" + samplesFromDistrBuckets.get(j) + "\",");
                 frontLines.add("\"over\":\"" + over.get(j) + "\",");
                 frontLines.add("\"under\":\"" + under.get(j) + "\",");
                 frontLines.add("name:\"bucket" + j + "\"");
@@ -204,6 +209,8 @@ public class LogsAndDistr {
             throws Exception {
 
         double[] dataArray = data.stream().mapToDouble(Double::doubleValue).toArray();
+
+        Arrays.sort(dataArray);
 
         List<ContinuousDistribution> distributionList = getBestInstancesFromDistList(distributionClasses, dataArray);
 
