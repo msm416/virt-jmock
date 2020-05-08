@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 
 public class LogsAndDistr {
     public static void main(String[] args) {
-//        createLogFile();
-
 //        try {
 //            runForSomeTimeAndGenerateLogsOnHeroku();
 //        } catch (Exception e) {
@@ -163,7 +161,7 @@ public class LogsAndDistr {
                 System.out.println(response);
                 Thread.sleep(2000);
                 response = Unirest.get("https://mmorpg-perf.herokuapp.com/?t=" +
-                        i + 1)
+                        (i + 1))
                         .asString();
                 System.out.println(response);
                 Thread.sleep(2000);
@@ -246,8 +244,10 @@ public class LogsAndDistr {
         }
 
         if (!isFindingBestMixtureDistr) {
+            System.out.println("Best distribution is: " + distributionList.get(maxPvalIndex));
             writeDistributionSummaryHTML(distributionList, dataArray);
         }
+
         return distributionList.get(maxPvalIndex);
     }
 

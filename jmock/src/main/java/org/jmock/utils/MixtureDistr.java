@@ -34,10 +34,10 @@ public class MixtureDistr extends ContinuousDistribution {
 
     // Heuristic to find a locally-good mixture distribution
     public static MixtureDistr findBestMixedDistribution(double[] data,
-                                                                List<ContinuousDistribution> distributions) {
+                                                         List<ContinuousDistribution> distributions) {
         int runs = (int) Math.pow(2, distributions.size());
 
-        double[][] weights = new double[runs+1][distributions.size()];
+        double[][] weights = new double[runs + 1][distributions.size()];
 
         double toleranceVal = 0.01;
 
@@ -68,13 +68,13 @@ public class MixtureDistr extends ContinuousDistribution {
 
         // Consider equally weighted distributions - which is often the case
         // i.e. adding three normal distributions
-        for(int j = 0; j < distributions.size(); j++) {
-            weights[runs][j] = 1.0/distributions.size();
+        for (int j = 0; j < distributions.size(); j++) {
+            weights[runs][j] = 1.0 / distributions.size();
         }
 
         List<ContinuousDistribution> mixtureDistributionList = new ArrayList<>();
 
-        for(int i = 0; i < runs+1; i++) {
+        for (int i = 0; i < runs + 1; i++) {
             mixtureDistributionList.add(new MixtureDistr(weights[i],
                     distributions.toArray(new ContinuousDistribution[0])));
         }
@@ -93,7 +93,7 @@ public class MixtureDistr extends ContinuousDistribution {
     @Override
     public double cdf(double v) {
         double cdf = 0.0;
-        for(int i = 0; i < distributions.length; i++) {
+        for (int i = 0; i < distributions.length; i++) {
             cdf += distributions[i].cdf(v) * weights[i];
         }
         return cdf;
@@ -103,5 +103,18 @@ public class MixtureDistr extends ContinuousDistribution {
     @Override
     public double[] getParams() {
         return new double[0];
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder acc = new StringBuilder("Mixture Distribution:");
+        for (int i = 0; i < weights.length; i++) {
+            acc.append(" ( weight = ")
+                    .append(weights[i])
+                    .append(", ")
+                    .append(distributions[i].toString())
+                    .append(")");
+        }
+        return acc.toString();
     }
 }
