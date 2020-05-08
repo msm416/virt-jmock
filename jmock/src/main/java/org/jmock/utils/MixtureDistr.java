@@ -35,7 +35,7 @@ public class MixtureDistr extends ContinuousDistribution {
     // Heuristic to find a locally-good mixture distribution
     public static MixtureDistr findBestMixedDistribution(double[] data,
                                                          List<ContinuousDistribution> distributions) {
-        int runs = (int) Math.pow(2, distributions.size());
+        int runs = (int) Math.max(Math.pow(2, distributions.size()), 100);
 
         double[][] weights = new double[runs + 1][distributions.size()];
 
