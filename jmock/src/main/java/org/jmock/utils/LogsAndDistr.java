@@ -48,7 +48,7 @@ public class LogsAndDistr {
     }
 
     private static void writeDistributionSummaryHTML(List<ContinuousDistribution> distributionList,
-                                                     double[] dataArray) {
+                                                     double[] dataArray, double[][] pval) {
         List<String> frontLines = new ArrayList<>();
 
         Class mockeryClass = Mockery.class;
@@ -60,7 +60,7 @@ public class LogsAndDistr {
                     "/frontDistr.html",
                     mockeryClass);
 
-            LogsAndDistr.writeMidSection(frontLines, distributionList, dataArray);
+            LogsAndDistr.writeMidSection(frontLines, distributionList, dataArray, pval);
 
             Files.write(filePath, frontLines);
 
@@ -71,7 +71,7 @@ public class LogsAndDistr {
     }
 
     private static void writeMidSection(List<String> frontLines, List<ContinuousDistribution> distributionList,
-                                        double[] dataArray) {
+                                        double[] dataArray, double[][] pval) {
         //TODO: make buckets
         int n = dataArray.length;
 
@@ -145,12 +145,12 @@ public class LogsAndDistr {
                     underValue = 0;
                     distributionYValue -= diff;
 
-                    totalOver[i] += diff;
+                    totalOver[i] += diff * xTickValues[j];
                 } else {
                     overValue = 0;
                     underValue = -diff;
 
-                    totalUnder[i] -= diff;
+                    totalUnder[i] -= diff * xTickValues[j];
                 }
 
                 frontLines.add("{");
@@ -190,6 +190,7 @@ public class LogsAndDistr {
             frontLines.add(",\"totalOver\":\"" + totalOver[i] + "\"");
             frontLines.add(",\"totalUnder\":\"" + totalUnder[i] + "\"");
             frontLines.add(",\"totalDiff\":\"" + (totalOver[i] - totalUnder[i]) + "\"");
+            frontLines.add(",\"pval\":\"" + pval[i][2] + "\"");
             frontLines.add("},");
         }
         frontLines.add("];");
@@ -307,7 +308,7 @@ public class LogsAndDistr {
 
         if (!isFindingBestMixtureDistr) {
             System.out.println("Best distribution is: " + distributionList.get(maxPvalIndex));
-            writeDistributionSummaryHTML(distributionList, dataArray);
+            writeDistributionSummaryHTML(distributionList, dataArray,  pval);
         }
 
         return distributionList.get(maxPvalIndex);

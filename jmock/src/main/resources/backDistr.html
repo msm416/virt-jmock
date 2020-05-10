@@ -13,6 +13,7 @@ var par_totalOver = document.createElement('P');
 var par_avgOver = document.createElement('P');
 var par_totalUnder = document.createElement('P');
 var par_avgUnder = document.createElement('P');
+var par_pval = document.createElement('P');
 
 container.setAttribute("class", "container");
 row.setAttribute("class", "row");
@@ -24,13 +25,15 @@ entry.id = "svg" + i;
 par_name.innerText = distributionInfo[i].name;
 par_name.setAttribute("style", "font-weight: bold");
 par_totalOver.setAttribute("style", "color:green;");
-par_totalOver.innerText = "Total Over: " + distributionInfo[i].totalOver;
+par_totalOver.innerText = "Total Area Over: " + distributionInfo[i].totalOver;
 par_avgOver.setAttribute("style", "color:green;");
-par_avgOver.innerText = "Average Over: " + (distributionInfo[i].totalOver / nbOfBuckets);
+par_avgOver.innerText = "Average (per bucket) Area Over: " + (distributionInfo[i].totalOver / nbOfBuckets);
 par_totalUnder.setAttribute("style", "color:red;");
-par_totalUnder.innerText = "Total Under: " + distributionInfo[i].totalUnder;
+par_totalUnder.innerText = "Total Area Under: " + distributionInfo[i].totalUnder;
 par_avgUnder.setAttribute("style", "color:red;");
-par_avgUnder.innerText = "Average Under: " + (distributionInfo[i].totalUnder / nbOfBuckets);
+par_avgUnder.innerText = "Average (per bucket) Area Under: " + (distributionInfo[i].totalUnder / nbOfBuckets);
+par_pval.setAttribute("style", "font-weight: bold");
+par_pval.innerText = "P value corresponding to Goodness To Fit test: " + distributionInfo[i].pval;
 
 list.appendChild(li);
 li.appendChild(container);
@@ -43,7 +46,7 @@ col_2.appendChild(par_totalOver);
 col_2.appendChild(par_avgOver);
 col_2.appendChild(par_totalUnder);
 col_2.appendChild(par_avgUnder);
-
+col_2.appendChild(par_pval);
 <!--li.appendChild(entry);-->
 <!--list.appendChild(li);-->
 }
