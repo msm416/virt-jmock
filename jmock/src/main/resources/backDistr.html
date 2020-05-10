@@ -70,6 +70,12 @@ var color = d3.scaleOrdinal()
 
 var data = dataNested[j];
 
+formatTicks = x => `${ parseFloat(x).toFixed(2)}`;
+
+formatTicksInArr = x => x.map(function(val, index){
+return val+1;
+})
+
 formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
 
 series = d3.stack()
@@ -108,8 +114,6 @@ formatRevenue = x => (+(x / 1e9).toFixed(2) >= 1)
 ? `${(x / 1e9).toFixed(2)}B`
 : `${(x / 1e6).toFixed(0)}M`;
 
-formatYear = x => `${ parseFloat(x).toFixed(2)}`;
-
 const svg = d3.select("#svg"+j).attr("viewBox", [0, 0, width, height]);
 
 svg.append("g")
@@ -125,7 +129,7 @@ svg.append("g")
 .attr("width", x.bandwidth() - 1)
 .attr("height", d => y(d[0]) - y(d[1]))
 .append("title")
-.text(d => `${d.data.name}, ${formatYear(d.data.year)}
+.text(d => `${d.data.name}, ${formatTicks(d.data.year)}
 ${(d.data.value)}`));
 
 svg.append("g")

@@ -102,7 +102,7 @@ public class LogsAndDistr {
             List<Double> over = new ArrayList<>();
             List<Double> under = new ArrayList<>();
 
-            for(int j = 0; j < n; j++) {
+            for (int j = 0; j < n; j++) {
                 samplesFromDistr[j] = distribution.inverseF(Math.random());
             }
 
@@ -111,41 +111,57 @@ public class LogsAndDistr {
             int[] dataArrayYValues = new int[nbOfBuckets];
             int[] distributionYValues = new int[nbOfBuckets];
 
-            double minVal = Math.min(dataArray[0], samplesFromDistr[0]);
-            double maxVal = Math.max(dataArray[n-1], samplesFromDistr[n-1]);
+            double minVal = Math.max(Math.min(dataArray[n/10], samplesFromDistr[n/10]), 0);
+            double maxVal = Math.max(dataArray[n * 9 / 10], samplesFromDistr[n * 9 / 10]);
+
+            System.out.println(minVal + " minval and " + maxVal + " maxval.");
 
             xTickValues[0] = minVal;
-            xTickValues[nbOfBuckets-1] = maxVal;
+            xTickValues[nbOfBuckets - 1] = maxVal;
 
             xTickValuesNested[i][0] = minVal;
-            xTickValuesNested[i][nbOfBuckets-1] = maxVal;
+            xTickValuesNested[i][nbOfBuckets - 1] = maxVal;
 
             double tickDistance = (maxVal - minVal) * (1.0 / (nbOfBuckets - 1));
 
-            for(int j = 1; j < nbOfBuckets -1; j++) {
-                xTickValues[j] = minVal + (maxVal - minVal) * ((double ) j / (nbOfBuckets - 1));
+            for (int j = 1; j < nbOfBuckets - 1; j++) {
+                xTickValues[j] = minVal + (maxVal - minVal) * ((double) j / (nbOfBuckets - 1));
                 xTickValuesNested[i][j] = xTickValues[j];
             }
 
-            for(int j = 0; j < n ; j++) {
-                dataArrayYValues[(int) ((dataArray[j] - minVal)/tickDistance)]++;
-                if(samplesFromDistr[j] <= 0) {
-                    distributionYValues[0]++;
+            for (int j = 0; j < n; j++) {
+
+                int bucketForDataArr = (int) ((dataArray[j] - minVal) / tickDistance);
+
+                if (bucketForDataArr < 0) {
+                    dataArrayYValues[0]++;
+                } else if (bucketForDataArr > nbOfBuckets - 1) {
+                    dataArrayYValues[nbOfBuckets - 1]++;
                 } else {
-                    distributionYValues[(int) ((samplesFromDistr[j] - minVal)/tickDistance)]++;
+                    dataArrayYValues[bucketForDataArr]++;
+                }
+
+                int bucketForSampleDistr = (int) ((samplesFromDistr[j] - minVal) / tickDistance);
+
+                if (bucketForSampleDistr < 0) {
+                    distributionYValues[0]++;
+                } else if (bucketForSampleDistr > nbOfBuckets - 1) {
+                    distributionYValues[nbOfBuckets - 1]++;
+                } else {
+                    distributionYValues[bucketForSampleDistr]++;
                 }
             }
 
             //{name: "8 - Track", year: 1973.4, value: 26},
             frontLines.add("[");
-            for(int j = 0; j < nbOfBuckets; j++) {
+            for (int j = 0; j < nbOfBuckets; j++) {
                 int dataArrayYValue = dataArrayYValues[j];
                 int distributionYValue = distributionYValues[j];
 
                 int overValue, underValue, diff;
                 diff = distributionYValue - dataArrayYValue;
 
-                if(diff > 0) {
+                if (diff > 0) {
                     overValue = diff;
                     underValue = 0;
                     distributionYValue -= diff;
@@ -181,7 +197,7 @@ public class LogsAndDistr {
         frontLines.add("var xTickValuesNested = [");
         for (int i = 0; i < distributionList.size(); i++) {
             frontLines.add("[");
-            for(int j = 0; j < nbOfBuckets; j++) {
+            for (int j = 0; j < nbOfBuckets; j++) {
                 frontLines.add("\"" + xTickValuesNested[i][j] + "\", ");
             }
             frontLines.add("],");
