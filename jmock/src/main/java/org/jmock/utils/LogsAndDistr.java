@@ -195,7 +195,7 @@ public class LogsAndDistr {
         }
         frontLines.add("];");
 
-        frontLines.add("var nbOfBuckets = \"" + nbOfBuckets + "\"");
+        frontLines.add("var nbOfBuckets = \"" + nbOfBuckets + "\";");
     }
 
     private static void determineBucketCounts(int nbOfBuckets, double[] samplesFromDistr, int[] distributionYValues, double minVal, double tickDistance, int j) {
