@@ -1,5 +1,3 @@
-var nbOfBuckets = "50";
-var columns = ["distribution", "over", "under"];
 var list = document.getElementById('distrList');
 
 for(i = 0; i < distributionInfo.length; i++) {
@@ -20,7 +18,7 @@ container.setAttribute("class", "container");
 row.setAttribute("class", "row");
 col_1.setAttribute("class", "col-md-auto");
 col_2.setAttribute("class", "col-md-auto");
-entry.setAttribute("width", "960");
+entry.setAttribute("width", "2000");
 entry.setAttribute("height", "500");
 entry.id = "svg" + i;
 par_name.innerText = distributionInfo[i].name;
@@ -50,18 +48,18 @@ col_2.appendChild(par_avgUnder);
 <!--list.appendChild(li);-->
 }
 
-var colorsArray = ["purple", "green", "red"];
+var colorsArray = ["green", "red", "blue"];
 
-var width = 960, height = 500;
+var width = 2000, height = 500;
 
 var margin = ({top: 20, right: 30, bottom: 30, left: 30});
 
 for(j = 0; j < distributionInfo.length; j++) {
 
 var colors = new Map([
-[distributionInfo[j].name, colorsArray[0]],
-["Over", colorsArray[1]],
-["Under", colorsArray[2]]
+["Over", colorsArray[0]],
+["Under", colorsArray[1]],
+[distributionInfo[j].name, colorsArray[2]]
 ]);
 
 var color = d3.scaleOrdinal()
@@ -70,7 +68,11 @@ var color = d3.scaleOrdinal()
 
 var data = dataNested[j];
 
-formatTicks = x => `${ parseFloat(x).toFixed(2)}`;
+formatTicks = x => (x == xTickValuesNested[j][0])
+? ("<=" + x)
+: ((x == xTickValuesNested[j][nbOfBuckets - 1])
+? (">=" + x)
+: `${x + ""}`);
 
 formatTicksInArr = x => x.map(function(val, index){
 return val+1;
@@ -82,11 +84,11 @@ series = d3.stack()
 .keys(Array.from(colors.keys()))
 .value((group, key) => group.get(key).value)
 .order(d3.stackOrderReverse)
-(Array.from(d3.rollup(data, ([d]) => d, d => d.year, d => d.name).values()))
+(Array.from(d3.rollup(data, ([d]) => d, d => d.tickVal, d => d.name).values()))
 .map(s => (s.forEach(d => d.data = d.data.get(s.key)), s));
 
 x = d3.scaleBand()
-.domain(data.map(d => d.year))
+.domain(data.map(d => d.tickVal))
 .rangeRound([margin.left, width - margin.right]);
 
 y = d3.scaleLinear()
@@ -97,6 +99,7 @@ xAxis = g => g
 .attr("transform", `translate(0,${height - margin.bottom})`)
 .call(d3.axisBottom(x)
 .tickValues(xTickValuesNested[j])
+.tickFormat(formatTicks)
 .tickSizeOuter(0));
 
 yAxis = g => g
@@ -124,13 +127,12 @@ svg.append("g")
 .call(g => g.selectAll("rect")
 .data(d => d)
 .join("rect")
-.attr("x", d => x(d.data.year))
+.attr("x", d => x(d.data.tickVal))
 .attr("y", d => y(d[1]))
 .attr("width", x.bandwidth() - 1)
 .attr("height", d => y(d[0]) - y(d[1]))
 .append("title")
-.text(d => `${d.data.name}, ${formatTicks(d.data.year)}
-${(d.data.value)}`));
+.text(d => `${d.data.name}: ${(d.data.value)} samples are ${formatTicks(d.data.tickVal)}`));
 
 svg.append("g")
 .call(xAxis);

@@ -9,1368 +9,2207 @@
     <title>Distributions Comparison</title>
 </head>
 <style>
-.bar rect { fill: steelblue; }
-.bar text { fill: #fff; font: 10px sans-serif; }
+    .bar rect { fill: steelblue; }
+    .bar text { fill: #fff; font: 10px sans-serif; }
 </style>
 <ol id="distrList">
 
 </ol>
 
 <script src="d3.min.js"></script>
+<script src="https://d3js.org/d3-array.v2.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 <script>
-var dataNested = [
-[
-{
-"distribution":"309.4",
-"over":"99.90033420799966",
-"under":"0.0",
-name:"bucket0"
-},
-{
-"distribution":"319.0",
-"over":"90.6196603236657",
-"under":"0.0",
-name:"bucket1"
-},
-{
-"distribution":"139.2206696140001",
-"over":"0.0",
-"under":"184.1793303859999",
-name:"bucket2"
-},
-{
-"distribution":"328.7",
-"over":"69.25356574800594",
-"under":"0.0",
-name:"bucket3"
-},
-{
-"distribution":"331.3",
-"over":"119.25569338057738",
-"under":"0.0",
-name:"bucket4"
-},
-{
-"distribution":"333.4",
-"over":"87.1638185329166",
-"under":"0.0",
-name:"bucket5"
-},
-{
-"distribution":"334.4",
-"over":"94.72830190657209",
-"under":"0.0",
-name:"bucket6"
-},
-{
-"distribution":"336.6",
-"over":"170.16726478444906",
-"under":"0.0",
-name:"bucket7"
-},
-{
-"distribution":"338.8",
-"over":"25.057604816526805",
-"under":"0.0",
-name:"bucket8"
-},
-{
-"distribution":"340.4",
-"over":"88.09690872070763",
-"under":"0.0",
-name:"bucket9"
-},
-{
-"distribution":"315.6042040732147",
-"over":"0.0",
-"under":"25.99579592678532",
-name:"bucket10"
-},
-{
-"distribution":"344.0",
-"over":"102.10383355175588",
-"under":"0.0",
-name:"bucket11"
-},
-{
-"distribution":"345.4",
-"over":"237.7166007114664",
-"under":"0.0",
-name:"bucket12"
-},
-{
-"distribution":"346.3",
-"over":"112.87428754458989",
-"under":"0.0",
-name:"bucket13"
-},
-{
-"distribution":"347.2",
-"over":"152.84248473620693",
-"under":"0.0",
-name:"bucket14"
-},
-{
-"distribution":"348.7",
-"over":"170.7116061235866",
-"under":"0.0",
-name:"bucket15"
-},
-{
-"distribution":"349.7",
-"over":"71.36141736817689",
-"under":"0.0",
-name:"bucket16"
-},
-{
-"distribution":"350.7",
-"over":"49.57667985826237",
-"under":"0.0",
-name:"bucket17"
-},
-{
-"distribution":"240.93154322289473",
-"over":"0.0",
-"under":"110.86845677710528",
-name:"bucket18"
-},
-{
-"distribution":"353.2",
-"over":"45.43477704654174",
-"under":"0.0",
-name:"bucket19"
-},
-{
-"distribution":"354.4",
-"over":"44.91604922370561",
-"under":"0.0",
-name:"bucket20"
-},
-{
-"distribution":"355.7",
-"over":"93.68283793328618",
-"under":"0.0",
-name:"bucket21"
-},
-{
-"distribution":"357.4",
-"over":"71.29245170836396",
-"under":"0.0",
-name:"bucket22"
-},
-{
-"distribution":"358.6",
-"over":"70.65081533487188",
-"under":"0.0",
-name:"bucket23"
-},
-{
-"distribution":"359.2",
-"over":"139.56933798812298",
-"under":"0.0",
-name:"bucket24"
-},
-{
-"distribution":"360.7",
-"over":"37.82493609872108",
-"under":"0.0",
-name:"bucket25"
-},
-{
-"distribution":"361.7",
-"over":"0.542059564723445",
-"under":"0.0",
-name:"bucket26"
-},
-{
-"distribution":"363.0",
-"over":"78.40396465738075",
-"under":"0.0",
-name:"bucket27"
-},
-{
-"distribution":"346.3819277667849",
-"over":"0.0",
-"under":"18.518072233215094",
-name:"bucket28"
-},
-{
-"distribution":"366.3",
-"over":"14.075223817669098",
-"under":"0.0",
-name:"bucket29"
-},
-{
-"distribution":"367.9",
-"over":"68.07615962869261",
-"under":"0.0",
-name:"bucket30"
-},
-{
-"distribution":"307.16044939602426",
-"over":"0.0",
-"under":"62.13955060397575",
-name:"bucket31"
-},
-{
-"distribution":"370.2",
-"over":"231.44252934639923",
-"under":"0.0",
-name:"bucket32"
-},
-{
-"distribution":"371.8",
-"over":"11.012532940344556",
-"under":"0.0",
-name:"bucket33"
-},
-{
-"distribution":"373.5",
-"over":"99.63671256304241",
-"under":"0.0",
-name:"bucket34"
-},
-{
-"distribution":"259.5009177352622",
-"over":"0.0",
-"under":"116.1990822647378",
-name:"bucket35"
-},
-{
-"distribution":"376.8",
-"over":"119.55475532263091",
-"under":"0.0",
-name:"bucket36"
-},
-{
-"distribution":"356.6344436676216",
-"over":"0.0",
-"under":"22.1655563323784",
-name:"bucket37"
-},
-{
-"distribution":"381.3",
-"over":"190.89797480587316",
-"under":"0.0",
-name:"bucket38"
-},
-{
-"distribution":"229.93829828341046",
-"over":"0.0",
-"under":"154.36170171658955",
-name:"bucket39"
-},
-{
-"distribution":"350.1459457661545",
-"over":"0.0",
-"under":"35.754054233845466",
-name:"bucket40"
-},
-{
-"distribution":"283.8738719783238",
-"over":"0.0",
-"under":"105.02612802167619",
-name:"bucket41"
-},
-{
-"distribution":"392.7",
-"over":"33.826776788298616",
-"under":"0.0",
-name:"bucket42"
-},
-{
-"distribution":"399.1",
-"over":"80.19029977193964",
-"under":"0.0",
-name:"bucket43"
-},
-{
-"distribution":"404.9",
-"over":"46.79744436289684",
-"under":"0.0",
-name:"bucket44"
-},
-{
-"distribution":"413.6",
-"over":"18.876418264649317",
-"under":"0.0",
-name:"bucket45"
-},
-{
-"distribution":"310.38013348219044",
-"over":"0.0",
-"under":"112.51986651780953",
-name:"bucket46"
-},
-{
-"distribution":"345.758865764373",
-"over":"0.0",
-"under":"98.94113423562698",
-name:"bucket47"
-},
-{
-"distribution":"433.6474775721128",
-"over":"0.0",
-"under":"44.45252242788723",
-name:"bucket48"
-},
-{
-"distribution":"435.54996243417855",
-"over":"0.0",
-"under":"1327.8500375658216",
-name:"bucket49"
-},
-],
-[
-{
-"distribution":"309.4",
-"over":"54.45667845398134",
-"under":"0.0",
-name:"bucket0"
-},
-{
-"distribution":"319.0",
-"over":"0.914393125444974",
-"under":"0.0",
-name:"bucket1"
-},
-{
-"distribution":"323.4",
-"over":"37.166693258248415",
-"under":"0.0",
-name:"bucket2"
-},
-{
-"distribution":"328.7",
-"over":"26.24522791611247",
-"under":"0.0",
-name:"bucket3"
-},
-{
-"distribution":"331.3",
-"over":"5.248448671440258",
-"under":"0.0",
-name:"bucket4"
-},
-{
-"distribution":"333.4",
-"over":"44.7483506075892",
-"under":"0.0",
-name:"bucket5"
-},
-{
-"distribution":"334.4",
-"over":"34.050424696146365",
-"under":"0.0",
-name:"bucket6"
-},
-{
-"distribution":"336.6",
-"over":"60.398445672693015",
-"under":"0.0",
-name:"bucket7"
-},
-{
-"distribution":"338.8",
-"over":"10.292709727207125",
-"under":"0.0",
-name:"bucket8"
-},
-{
-"distribution":"340.4",
-"over":"33.57903865809578",
-"under":"0.0",
-name:"bucket9"
-},
-{
-"distribution":"334.29793431345263",
-"over":"0.0",
-"under":"7.302065686547394",
-name:"bucket10"
-},
-{
-"distribution":"344.0",
-"over":"21.565471597734472",
-"under":"0.0",
-name:"bucket11"
-},
-{
-"distribution":"324.7401071997295",
-"over":"0.0",
-"under":"20.659892800270484",
-name:"bucket12"
-},
-{
-"distribution":"346.3",
-"over":"25.411153095253667",
-"under":"0.0",
-name:"bucket13"
-},
-{
-"distribution":"347.2",
-"over":"42.63815550103493",
-"under":"0.0",
-name:"bucket14"
-},
-{
-"distribution":"348.7",
-"over":"39.52013028758944",
-"under":"0.0",
-name:"bucket15"
-},
-{
-"distribution":"349.7",
-"over":"2.4925748587574503",
-"under":"0.0",
-name:"bucket16"
-},
-{
-"distribution":"350.7",
-"over":"16.36288711615299",
-"under":"0.0",
-name:"bucket17"
-},
-{
-"distribution":"351.8",
-"over":"41.79612645251734",
-"under":"0.0",
-name:"bucket18"
-},
-{
-"distribution":"331.0580871593847",
-"over":"0.0",
-"under":"22.141912840615305",
-name:"bucket19"
-},
-{
-"distribution":"354.4",
-"over":"31.225563296503708",
-"under":"0.0",
-name:"bucket20"
-},
-{
-"distribution":"355.7",
-"over":"52.48450244009763",
-"under":"0.0",
-name:"bucket21"
-},
-{
-"distribution":"349.4718670840289",
-"over":"0.0",
-"under":"7.928132915971105",
-name:"bucket22"
-},
-{
-"distribution":"353.68994255532954",
-"over":"0.0",
-"under":"4.910057444670485",
-name:"bucket23"
-},
-{
-"distribution":"359.2",
-"over":"43.79445197762993",
-"under":"0.0",
-name:"bucket24"
-},
-{
-"distribution":"360.7",
-"over":"20.58909363694073",
-"under":"0.0",
-name:"bucket25"
-},
-{
-"distribution":"361.7",
-"over":"32.4936798588156",
-"under":"0.0",
-name:"bucket26"
-},
-{
-"distribution":"350.0743072888247",
-"over":"0.0",
-"under":"12.925692711175316",
-name:"bucket27"
-},
-{
-"distribution":"358.7842896401358",
-"over":"0.0",
-"under":"6.115710359864181",
-name:"bucket28"
-},
-{
-"distribution":"345.96886290940904",
-"over":"0.0",
-"under":"20.33113709059097",
-name:"bucket29"
-},
-{
-"distribution":"367.9",
-"over":"10.392701598164876",
-"under":"0.0",
-name:"bucket30"
-},
-{
-"distribution":"353.50789818808823",
-"over":"0.0",
-"under":"15.792101811911778",
-name:"bucket31"
-},
-{
-"distribution":"319.93452406369823",
-"over":"0.0",
-"under":"50.265475936301755",
-name:"bucket32"
-},
-{
-"distribution":"345.7461206678421",
-"over":"0.0",
-"under":"26.05387933215792",
-name:"bucket33"
-},
-{
-"distribution":"301.35045390286257",
-"over":"0.0",
-"under":"72.14954609713743",
-name:"bucket34"
-},
-{
-"distribution":"313.2118135070706",
-"over":"0.0",
-"under":"62.4881864929294",
-name:"bucket35"
-},
-{
-"distribution":"368.46339943199007",
-"over":"0.0",
-"under":"8.336600568009942",
-name:"bucket36"
-},
-{
-"distribution":"368.83806666077936",
-"over":"0.0",
-"under":"9.96193333922065",
-name:"bucket37"
-},
-{
-"distribution":"350.0195653620566",
-"over":"0.0",
-"under":"31.280434637943415",
-name:"bucket38"
-},
-{
-"distribution":"314.6182290040182",
-"over":"0.0",
-"under":"69.68177099598182",
-name:"bucket39"
-},
-{
-"distribution":"383.00018361648404",
-"over":"0.0",
-"under":"2.8998163835159403",
-name:"bucket40"
-},
-{
-"distribution":"337.4086105944838",
-"over":"0.0",
-"under":"51.4913894055162",
-name:"bucket41"
-},
-{
-"distribution":"337.01819373829613",
-"over":"0.0",
-"under":"55.681806261703855",
-name:"bucket42"
-},
-{
-"distribution":"394.1302274108558",
-"over":"0.0",
-"under":"4.969772589144213",
-name:"bucket43"
-},
-{
-"distribution":"384.00227166494886",
-"over":"0.0",
-"under":"20.897728335051113",
-name:"bucket44"
-},
-{
-"distribution":"321.8891026000971",
-"over":"0.0",
-"under":"91.71089739990293",
-name:"bucket45"
-},
-{
-"distribution":"380.2384260583236",
-"over":"0.0",
-"under":"42.66157394167635",
-name:"bucket46"
-},
-{
-"distribution":"315.6136180956596",
-"over":"0.0",
-"under":"129.08638190434039",
-name:"bucket47"
-},
-{
-"distribution":"355.7714834114795",
-"over":"0.0",
-"under":"122.32851658852053",
-name:"bucket48"
-},
-{
-"distribution":"314.322859523571",
-"over":"0.0",
-"under":"1449.0771404764291",
-name:"bucket49"
-},
-],
-[
-{
-"distribution":"309.4000000000001",
-"over":"1797.6698592757389",
-"under":"0.0",
-name:"bucket0"
-},
-{
-"distribution":"319.0",
-"over":"1628.330692514594",
-"under":"0.0",
-name:"bucket1"
-},
-{
-"distribution":"323.4000000000001",
-"over":"1847.8941480355847",
-"under":"0.0",
-name:"bucket2"
-},
-{
-"distribution":"328.6999999999998",
-"over":"2446.147317880268",
-"under":"0.0",
-name:"bucket3"
-},
-{
-"distribution":"331.3000000000002",
-"over":"2303.405811619881",
-"under":"0.0",
-name:"bucket4"
-},
-{
-"distribution":"333.39999999999986",
-"over":"1348.114226117676",
-"under":"0.0",
-name:"bucket5"
-},
-{
-"distribution":"334.4000000000001",
-"over":"2194.8901243951755",
-"under":"0.0",
-name:"bucket6"
-},
-{
-"distribution":"336.5999999999999",
-"over":"1729.49235317887",
-"under":"0.0",
-name:"bucket7"
-},
-{
-"distribution":"338.8000000000002",
-"over":"2820.1217686970026",
-"under":"0.0",
-name:"bucket8"
-},
-{
-"distribution":"340.4000000000001",
-"over":"2006.0823265430722",
-"under":"0.0",
-name:"bucket9"
-},
-{
-"distribution":"341.60000000000014",
-"over":"1692.3433667841355",
-"under":"0.0",
-name:"bucket10"
-},
-{
-"distribution":"344.0",
-"over":"2310.791568668781",
-"under":"0.0",
-name:"bucket11"
-},
-{
-"distribution":"345.4000000000001",
-"over":"2124.0518160835786",
-"under":"0.0",
-name:"bucket12"
-},
-{
-"distribution":"346.3000000000002",
-"over":"2204.835419441164",
-"under":"0.0",
-name:"bucket13"
-},
-{
-"distribution":"347.20000000000005",
-"over":"1837.6596104767812",
-"under":"0.0",
-name:"bucket14"
-},
-{
-"distribution":"348.6999999999998",
-"over":"2906.320829566464",
-"under":"0.0",
-name:"bucket15"
-},
-{
-"distribution":"349.6999999999998",
-"over":"2257.026497467407",
-"under":"0.0",
-name:"bucket16"
-},
-{
-"distribution":"350.70000000000005",
-"over":"1916.3429642068593",
-"under":"0.0",
-name:"bucket17"
-},
-{
-"distribution":"351.8000000000002",
-"over":"2226.1400455468565",
-"under":"0.0",
-name:"bucket18"
-},
-{
-"distribution":"353.1999999999998",
-"over":"2485.8614950199976",
-"under":"0.0",
-name:"bucket19"
-},
-{
-"distribution":"354.4000000000001",
-"over":"1987.1640923195487",
-"under":"0.0",
-name:"bucket20"
-},
-{
-"distribution":"355.6999999999998",
-"over":"2315.9163606226557",
-"under":"0.0",
-name:"bucket21"
-},
-{
-"distribution":"357.4000000000001",
-"over":"2706.7701129132656",
-"under":"0.0",
-name:"bucket22"
-},
-{
-"distribution":"358.5999999999999",
-"over":"1793.2924188906468",
-"under":"0.0",
-name:"bucket23"
-},
-{
-"distribution":"359.20000000000005",
-"over":"2019.3194747213104",
-"under":"0.0",
-name:"bucket24"
-},
-{
-"distribution":"360.6999999999998",
-"over":"2199.248182296834",
-"under":"0.0",
-name:"bucket25"
-},
-{
-"distribution":"361.6999999999998",
-"over":"2184.8725415227987",
-"under":"0.0",
-name:"bucket26"
-},
-{
-"distribution":"363.0",
-"over":"1638.9854643787955",
-"under":"0.0",
-name:"bucket27"
-},
-{
-"distribution":"364.9000000000001",
-"over":"1246.8667865314737",
-"under":"0.0",
-name:"bucket28"
-},
-{
-"distribution":"366.3000000000002",
-"over":"2192.0551027695606",
-"under":"0.0",
-name:"bucket29"
-},
-{
-"distribution":"367.9000000000001",
-"over":"2040.6259858671315",
-"under":"0.0",
-name:"bucket30"
-},
-{
-"distribution":"369.3000000000002",
-"over":"2273.1682681343013",
-"under":"0.0",
-name:"bucket31"
-},
-{
-"distribution":"370.20000000000005",
-"over":"1830.9415656587937",
-"under":"0.0",
-name:"bucket32"
-},
-{
-"distribution":"371.8000000000002",
-"over":"2301.8135919595748",
-"under":"0.0",
-name:"bucket33"
-},
-{
-"distribution":"373.5",
-"over":"3083.599611661992",
-"under":"0.0",
-name:"bucket34"
-},
-{
-"distribution":"375.70000000000005",
-"over":"1811.1672661493901",
-"under":"0.0",
-name:"bucket35"
-},
-{
-"distribution":"376.79999999999995",
-"over":"1981.118065122878",
-"under":"0.0",
-name:"bucket36"
-},
-{
-"distribution":"378.79999999999995",
-"over":"1835.6262397802268",
-"under":"0.0",
-name:"bucket37"
-},
-{
-"distribution":"381.3000000000002",
-"over":"2236.1045306601663",
-"under":"0.0",
-name:"bucket38"
-},
-{
-"distribution":"384.29999999999995",
-"over":"1942.894363585812",
-"under":"0.0",
-name:"bucket39"
-},
-{
-"distribution":"385.9000000000001",
-"over":"1690.1475018596507",
-"under":"0.0",
-name:"bucket40"
-},
-{
-"distribution":"388.9000000000001",
-"over":"2166.4069466993174",
-"under":"0.0",
-name:"bucket41"
-},
-{
-"distribution":"392.70000000000005",
-"over":"2030.4129495665686",
-"under":"0.0",
-name:"bucket42"
-},
-{
-"distribution":"399.0999999999999",
-"over":"1766.79049649328",
-"under":"0.0",
-name:"bucket43"
-},
-{
-"distribution":"404.9000000000001",
-"over":"2490.033160790868",
-"under":"0.0",
-name:"bucket44"
-},
-{
-"distribution":"413.5999999999999",
-"over":"2475.923721792314",
-"under":"0.0",
-name:"bucket45"
-},
-{
-"distribution":"422.9000000000001",
-"over":"2215.045639453445",
-"under":"0.0",
-name:"bucket46"
-},
-{
-"distribution":"444.6999999999998",
-"over":"2481.5892515502583",
-"under":"0.0",
-name:"bucket47"
-},
-{
-"distribution":"478.0999999999999",
-"over":"1850.5680734756243",
-"under":"0.0",
-name:"bucket48"
-},
-{
-"distribution":"1763.4",
-"over":"1296.186693093604",
-"under":"0.0",
-name:"bucket49"
-},
-],
-[
-{
-"distribution":"309.4",
-"over":"1.2760707264420716",
-"under":"0.0",
-name:"bucket0"
-},
-{
-"distribution":"319.0",
-"over":"424.4455969661873",
-"under":"0.0",
-name:"bucket1"
-},
-{
-"distribution":"323.4",
-"over":"736.2589083955057",
-"under":"0.0",
-name:"bucket2"
-},
-{
-"distribution":"328.7",
-"over":"197.42256084230297",
-"under":"0.0",
-name:"bucket3"
-},
-{
-"distribution":"331.3",
-"over":"40.79115399574829",
-"under":"0.0",
-name:"bucket4"
-},
-{
-"distribution":"333.4",
-"over":"5.3014056588455105",
-"under":"0.0",
-name:"bucket5"
-},
-{
-"distribution":"334.4",
-"over":"164.7217983736104",
-"under":"0.0",
-name:"bucket6"
-},
-{
-"distribution":"336.6",
-"over":"22.15732321439299",
-"under":"0.0",
-name:"bucket7"
-},
-{
-"distribution":"338.8",
-"over":"344.2178848358539",
-"under":"0.0",
-name:"bucket8"
-},
-{
-"distribution":"340.4",
-"over":"29.871881298803373",
-"under":"0.0",
-name:"bucket9"
-},
-{
-"distribution":"341.6",
-"over":"36.2179181469466",
-"under":"0.0",
-name:"bucket10"
-},
-{
-"distribution":"344.0",
-"over":"247.58105163297728",
-"under":"0.0",
-name:"bucket11"
-},
-{
-"distribution":"345.4",
-"over":"251.51597757100478",
-"under":"0.0",
-name:"bucket12"
-},
-{
-"distribution":"346.3",
-"over":"128.75121249124783",
-"under":"0.0",
-name:"bucket13"
-},
-{
-"distribution":"347.2",
-"over":"360.12862297322096",
-"under":"0.0",
-name:"bucket14"
-},
-{
-"distribution":"348.7",
-"over":"2.2149065586190204",
-"under":"0.0",
-name:"bucket15"
-},
-{
-"distribution":"349.7",
-"over":"213.73611546255285",
-"under":"0.0",
-name:"bucket16"
-},
-{
-"distribution":"350.7",
-"over":"178.0296351381681",
-"under":"0.0",
-name:"bucket17"
-},
-{
-"distribution":"341.0798887663291",
-"over":"0.0",
-"under":"10.720111233670934",
-name:"bucket18"
-},
-{
-"distribution":"353.2",
-"over":"43.478247462379784",
-"under":"0.0",
-name:"bucket19"
-},
-{
-"distribution":"337.6066527281099",
-"over":"0.0",
-"under":"16.79334727189007",
-name:"bucket20"
-},
-{
-"distribution":"355.7",
-"over":"329.1035670674133",
-"under":"0.0",
-name:"bucket21"
-},
-{
-"distribution":"349.9687681810254",
-"over":"0.0",
-"under":"7.431231818974595",
-name:"bucket22"
-},
-{
-"distribution":"358.6",
-"over":"139.48724831463693",
-"under":"0.0",
-name:"bucket23"
-},
-{
-"distribution":"359.2",
-"over":"375.62670281416746",
-"under":"0.0",
-name:"bucket24"
-},
-{
-"distribution":"360.7",
-"over":"188.32417923768952",
-"under":"0.0",
-name:"bucket25"
-},
-{
-"distribution":"361.7",
-"over":"143.3360586199057",
-"under":"0.0",
-name:"bucket26"
-},
-{
-"distribution":"355.67176696367807",
-"over":"0.0",
-"under":"7.328233036321933",
-name:"bucket27"
-},
-{
-"distribution":"364.9",
-"over":"756.3006963328586",
-"under":"0.0",
-name:"bucket28"
-},
-{
-"distribution":"354.5564672993643",
-"over":"0.0",
-"under":"11.74353270063574",
-name:"bucket29"
-},
-{
-"distribution":"367.9",
-"over":"25.139851696924723",
-"under":"0.0",
-name:"bucket30"
-},
-{
-"distribution":"369.3",
-"over":"363.6906766518751",
-"under":"0.0",
-name:"bucket31"
-},
-{
-"distribution":"338.3960183992257",
-"over":"0.0",
-"under":"31.803981600774307",
-name:"bucket32"
-},
-{
-"distribution":"371.8",
-"over":"8.250332506146322",
-"under":"0.0",
-name:"bucket33"
-},
-{
-"distribution":"364.2785768328587",
-"over":"0.0",
-"under":"9.221423167141324",
-name:"bucket34"
-},
-{
-"distribution":"365.5145843378822",
-"over":"0.0",
-"under":"10.185415662117805",
-name:"bucket35"
-},
-{
-"distribution":"376.8",
-"over":"3.6220060210626457",
-"under":"0.0",
-name:"bucket36"
-},
-{
-"distribution":"378.8",
-"over":"171.28807385317208",
-"under":"0.0",
-name:"bucket37"
-},
-{
-"distribution":"381.3",
-"over":"278.3476120495048",
-"under":"0.0",
-name:"bucket38"
-},
-{
-"distribution":"384.3",
-"over":"406.34157731715976",
-"under":"0.0",
-name:"bucket39"
-},
-{
-"distribution":"385.9",
-"over":"298.3843220840282",
-"under":"0.0",
-name:"bucket40"
-},
-{
-"distribution":"381.0529093534985",
-"over":"0.0",
-"under":"7.847090646501499",
-name:"bucket41"
-},
-{
-"distribution":"392.7",
-"over":"10.972468458750086",
-"under":"0.0",
-name:"bucket42"
-},
-{
-"distribution":"399.1",
-"over":"383.91130191829404",
-"under":"0.0",
-name:"bucket43"
-},
-{
-"distribution":"336.57066230479205",
-"over":"0.0",
-"under":"68.32933769520793",
-name:"bucket44"
-},
-{
-"distribution":"413.6",
-"over":"212.77975839520923",
-"under":"0.0",
-name:"bucket45"
-},
-{
-"distribution":"314.23854309531623",
-"over":"0.0",
-"under":"108.66145690468375",
-name:"bucket46"
-},
-{
-"distribution":"444.7",
-"over":"307.00965556209024",
-"under":"0.0",
-name:"bucket47"
-},
-{
-"distribution":"478.1",
-"over":"16.627959800744236",
-"under":"0.0",
-name:"bucket48"
-},
-{
-"distribution":"345.83527030119023",
-"over":"0.0",
-"under":"1417.56472969881",
-name:"bucket49"
-},
-],
-];
-var distributionInfo = [
-{
-name:"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433"
-,"totalOver":"3238.134119483619"
-,"totalUnder":"2418.971289243454"
-,"totalDiff":"819.162830240165"
-},
-{
-name:"LaplaceDist : mu = 360.0, beta = 67.42942345924453"
-,"totalOver":"687.8669025041518"
-,"totalUnder":"2419.1295543471"
-,"totalDiff":"-1731.2626518429483"
-},
-{
-name:"UniformDist : a = 299.0, b = 4692.0"
-,"totalOver":"104168.176701842"
-,"totalUnder":"0.0"
-,"totalDiff":"104168.176701842"
-},
-{
-name:"Mixture Distribution: ( weight = 0.007808089858014142, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9379998679188707, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.05419204222311517, UniformDist : a = 299.0, b = 4692.0)"
-,"totalOver":"7846.662320446444"
-,"totalUnder":"1707.6298914367298"
-,"totalDiff":"6139.032429009714"
-},
-];
-var nbOfBuckets = "50"
-var columns = ["distribution", "over", "under"];
-var list = document.getElementById('distrList');
+    var dataNested = [
+        [
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"0", "value":"0"
+            },
+            {
+                "name":"Over", "year":"0", "value":"63"
+            },
+            {
+                "name":"Under", "year":"0", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"16", "value":"0"
+            },
+            {
+                "name":"Over", "year":"16", "value":"7"
+            },
+            {
+                "name":"Under", "year":"16", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"33", "value":"0"
+            },
+            {
+                "name":"Over", "year":"33", "value":"6"
+            },
+            {
+                "name":"Under", "year":"33", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"49", "value":"0"
+            },
+            {
+                "name":"Over", "year":"49", "value":"5"
+            },
+            {
+                "name":"Under", "year":"49", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"66", "value":"0"
+            },
+            {
+                "name":"Over", "year":"66", "value":"4"
+            },
+            {
+                "name":"Under", "year":"66", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"82", "value":"0"
+            },
+            {
+                "name":"Over", "year":"82", "value":"5"
+            },
+            {
+                "name":"Under", "year":"82", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"99", "value":"0"
+            },
+            {
+                "name":"Over", "year":"99", "value":"6"
+            },
+            {
+                "name":"Under", "year":"99", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"116", "value":"0"
+            },
+            {
+                "name":"Over", "year":"116", "value":"4"
+            },
+            {
+                "name":"Under", "year":"116", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"132", "value":"0"
+            },
+            {
+                "name":"Over", "year":"132", "value":"3"
+            },
+            {
+                "name":"Under", "year":"132", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"149", "value":"0"
+            },
+            {
+                "name":"Over", "year":"149", "value":"9"
+            },
+            {
+                "name":"Under", "year":"149", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"165", "value":"0"
+            },
+            {
+                "name":"Over", "year":"165", "value":"6"
+            },
+            {
+                "name":"Under", "year":"165", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"182", "value":"0"
+            },
+            {
+                "name":"Over", "year":"182", "value":"11"
+            },
+            {
+                "name":"Under", "year":"182", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"199", "value":"0"
+            },
+            {
+                "name":"Over", "year":"199", "value":"5"
+            },
+            {
+                "name":"Under", "year":"199", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"215", "value":"0"
+            },
+            {
+                "name":"Over", "year":"215", "value":"13"
+            },
+            {
+                "name":"Under", "year":"215", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"232", "value":"0"
+            },
+            {
+                "name":"Over", "year":"232", "value":"11"
+            },
+            {
+                "name":"Under", "year":"232", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"248", "value":"0"
+            },
+            {
+                "name":"Over", "year":"248", "value":"12"
+            },
+            {
+                "name":"Under", "year":"248", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"265", "value":"0"
+            },
+            {
+                "name":"Over", "year":"265", "value":"8"
+            },
+            {
+                "name":"Under", "year":"265", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"282", "value":"0"
+            },
+            {
+                "name":"Over", "year":"282", "value":"10"
+            },
+            {
+                "name":"Under", "year":"282", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"298", "value":"10"
+            },
+            {
+                "name":"Over", "year":"298", "value":"1"
+            },
+            {
+                "name":"Under", "year":"298", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"315", "value":"6"
+            },
+            {
+                "name":"Over", "year":"315", "value":"0"
+            },
+            {
+                "name":"Under", "year":"315", "value":"30"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"331", "value":"9"
+            },
+            {
+                "name":"Over", "year":"331", "value":"0"
+            },
+            {
+                "name":"Under", "year":"331", "value":"98"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"348", "value":"7"
+            },
+            {
+                "name":"Over", "year":"348", "value":"0"
+            },
+            {
+                "name":"Under", "year":"348", "value":"129"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"365", "value":"10"
+            },
+            {
+                "name":"Over", "year":"365", "value":"0"
+            },
+            {
+                "name":"Under", "year":"365", "value":"87"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"381", "value":"9"
+            },
+            {
+                "name":"Over", "year":"381", "value":"0"
+            },
+            {
+                "name":"Under", "year":"381", "value":"38"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"398", "value":"10"
+            },
+            {
+                "name":"Over", "year":"398", "value":"0"
+            },
+            {
+                "name":"Under", "year":"398", "value":"13"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"414", "value":"7"
+            },
+            {
+                "name":"Over", "year":"414", "value":"0"
+            },
+            {
+                "name":"Under", "year":"414", "value":"11"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"431", "value":"1"
+            },
+            {
+                "name":"Over", "year":"431", "value":"10"
+            },
+            {
+                "name":"Under", "year":"431", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"448", "value":"7"
+            },
+            {
+                "name":"Over", "year":"448", "value":"5"
+            },
+            {
+                "name":"Under", "year":"448", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"464", "value":"6"
+            },
+            {
+                "name":"Over", "year":"464", "value":"9"
+            },
+            {
+                "name":"Under", "year":"464", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"481", "value":"1"
+            },
+            {
+                "name":"Over", "year":"481", "value":"6"
+            },
+            {
+                "name":"Under", "year":"481", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"497", "value":"0"
+            },
+            {
+                "name":"Over", "year":"497", "value":"11"
+            },
+            {
+                "name":"Under", "year":"497", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"514", "value":"1"
+            },
+            {
+                "name":"Over", "year":"514", "value":"7"
+            },
+            {
+                "name":"Under", "year":"514", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"530", "value":"0"
+            },
+            {
+                "name":"Over", "year":"530", "value":"5"
+            },
+            {
+                "name":"Under", "year":"530", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"547", "value":"0"
+            },
+            {
+                "name":"Over", "year":"547", "value":"14"
+            },
+            {
+                "name":"Under", "year":"547", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"564", "value":"1"
+            },
+            {
+                "name":"Over", "year":"564", "value":"13"
+            },
+            {
+                "name":"Under", "year":"564", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"580", "value":"0"
+            },
+            {
+                "name":"Over", "year":"580", "value":"6"
+            },
+            {
+                "name":"Under", "year":"580", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"597", "value":"1"
+            },
+            {
+                "name":"Over", "year":"597", "value":"11"
+            },
+            {
+                "name":"Under", "year":"597", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"613", "value":"0"
+            },
+            {
+                "name":"Over", "year":"613", "value":"11"
+            },
+            {
+                "name":"Under", "year":"613", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"630", "value":"0"
+            },
+            {
+                "name":"Over", "year":"630", "value":"9"
+            },
+            {
+                "name":"Under", "year":"630", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"647", "value":"0"
+            },
+            {
+                "name":"Over", "year":"647", "value":"7"
+            },
+            {
+                "name":"Under", "year":"647", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"663", "value":"0"
+            },
+            {
+                "name":"Over", "year":"663", "value":"6"
+            },
+            {
+                "name":"Under", "year":"663", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"680", "value":"0"
+            },
+            {
+                "name":"Over", "year":"680", "value":"8"
+            },
+            {
+                "name":"Under", "year":"680", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"696", "value":"0"
+            },
+            {
+                "name":"Over", "year":"696", "value":"8"
+            },
+            {
+                "name":"Under", "year":"696", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"713", "value":"0"
+            },
+            {
+                "name":"Over", "year":"713", "value":"7"
+            },
+            {
+                "name":"Under", "year":"713", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"730", "value":"0"
+            },
+            {
+                "name":"Over", "year":"730", "value":"5"
+            },
+            {
+                "name":"Under", "year":"730", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"746", "value":"0"
+            },
+            {
+                "name":"Over", "year":"746", "value":"5"
+            },
+            {
+                "name":"Under", "year":"746", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"763", "value":"0"
+            },
+            {
+                "name":"Over", "year":"763", "value":"4"
+            },
+            {
+                "name":"Under", "year":"763", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"779", "value":"0"
+            },
+            {
+                "name":"Over", "year":"779", "value":"6"
+            },
+            {
+                "name":"Under", "year":"779", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"796", "value":"0"
+            },
+            {
+                "name":"Over", "year":"796", "value":"4"
+            },
+            {
+                "name":"Under", "year":"796", "value":"0"
+            },
+            {
+                "name":"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433", "year":"813", "value":"11"
+            },
+            {
+                "name":"Over", "year":"813", "value":"40"
+            },
+            {
+                "name":"Under", "year":"813", "value":"0"
+            },
+        ],
+        [
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"273", "value":"0"
+            },
+            {
+                "name":"Over", "year":"273", "value":"56"
+            },
+            {
+                "name":"Under", "year":"273", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"277", "value":"0"
+            },
+            {
+                "name":"Over", "year":"277", "value":"3"
+            },
+            {
+                "name":"Under", "year":"277", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"281", "value":"0"
+            },
+            {
+                "name":"Over", "year":"281", "value":"3"
+            },
+            {
+                "name":"Under", "year":"281", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"285", "value":"0"
+            },
+            {
+                "name":"Over", "year":"285", "value":"7"
+            },
+            {
+                "name":"Under", "year":"285", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"290", "value":"0"
+            },
+            {
+                "name":"Over", "year":"290", "value":"5"
+            },
+            {
+                "name":"Under", "year":"290", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"294", "value":"0"
+            },
+            {
+                "name":"Over", "year":"294", "value":"9"
+            },
+            {
+                "name":"Under", "year":"294", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"298", "value":"2"
+            },
+            {
+                "name":"Over", "year":"298", "value":"0"
+            },
+            {
+                "name":"Under", "year":"298", "value":"1"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"302", "value":"0"
+            },
+            {
+                "name":"Over", "year":"302", "value":"3"
+            },
+            {
+                "name":"Under", "year":"302", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"306", "value":"0"
+            },
+            {
+                "name":"Over", "year":"306", "value":"10"
+            },
+            {
+                "name":"Under", "year":"306", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"310", "value":"5"
+            },
+            {
+                "name":"Over", "year":"310", "value":"6"
+            },
+            {
+                "name":"Under", "year":"310", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"314", "value":"5"
+            },
+            {
+                "name":"Over", "year":"314", "value":"1"
+            },
+            {
+                "name":"Under", "year":"314", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"318", "value":"10"
+            },
+            {
+                "name":"Over", "year":"318", "value":"0"
+            },
+            {
+                "name":"Under", "year":"318", "value":"1"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"322", "value":"6"
+            },
+            {
+                "name":"Over", "year":"322", "value":"6"
+            },
+            {
+                "name":"Under", "year":"322", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"326", "value":"7"
+            },
+            {
+                "name":"Over", "year":"326", "value":"0"
+            },
+            {
+                "name":"Under", "year":"326", "value":"4"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"330", "value":"13"
+            },
+            {
+                "name":"Over", "year":"330", "value":"0"
+            },
+            {
+                "name":"Under", "year":"330", "value":"12"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"334", "value":"15"
+            },
+            {
+                "name":"Over", "year":"334", "value":"0"
+            },
+            {
+                "name":"Under", "year":"334", "value":"8"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"339", "value":"10"
+            },
+            {
+                "name":"Over", "year":"339", "value":"0"
+            },
+            {
+                "name":"Under", "year":"339", "value":"12"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"343", "value":"10"
+            },
+            {
+                "name":"Over", "year":"343", "value":"0"
+            },
+            {
+                "name":"Under", "year":"343", "value":"27"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"347", "value":"10"
+            },
+            {
+                "name":"Over", "year":"347", "value":"0"
+            },
+            {
+                "name":"Under", "year":"347", "value":"24"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"351", "value":"12"
+            },
+            {
+                "name":"Over", "year":"351", "value":"0"
+            },
+            {
+                "name":"Under", "year":"351", "value":"19"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"355", "value":"12"
+            },
+            {
+                "name":"Over", "year":"355", "value":"0"
+            },
+            {
+                "name":"Under", "year":"355", "value":"23"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"359", "value":"15"
+            },
+            {
+                "name":"Over", "year":"359", "value":"0"
+            },
+            {
+                "name":"Under", "year":"359", "value":"15"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"363", "value":"19"
+            },
+            {
+                "name":"Over", "year":"363", "value":"0"
+            },
+            {
+                "name":"Under", "year":"363", "value":"4"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"367", "value":"16"
+            },
+            {
+                "name":"Over", "year":"367", "value":"0"
+            },
+            {
+                "name":"Under", "year":"367", "value":"17"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"371", "value":"11"
+            },
+            {
+                "name":"Over", "year":"371", "value":"0"
+            },
+            {
+                "name":"Under", "year":"371", "value":"8"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"375", "value":"10"
+            },
+            {
+                "name":"Over", "year":"375", "value":"0"
+            },
+            {
+                "name":"Under", "year":"375", "value":"14"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"379", "value":"8"
+            },
+            {
+                "name":"Over", "year":"379", "value":"0"
+            },
+            {
+                "name":"Under", "year":"379", "value":"7"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"383", "value":"16"
+            },
+            {
+                "name":"Over", "year":"383", "value":"0"
+            },
+            {
+                "name":"Under", "year":"383", "value":"3"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"387", "value":"10"
+            },
+            {
+                "name":"Over", "year":"387", "value":"0"
+            },
+            {
+                "name":"Under", "year":"387", "value":"5"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"392", "value":"5"
+            },
+            {
+                "name":"Over", "year":"392", "value":"10"
+            },
+            {
+                "name":"Under", "year":"392", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"396", "value":"4"
+            },
+            {
+                "name":"Over", "year":"396", "value":"0"
+            },
+            {
+                "name":"Under", "year":"396", "value":"1"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"400", "value":"8"
+            },
+            {
+                "name":"Over", "year":"400", "value":"0"
+            },
+            {
+                "name":"Under", "year":"400", "value":"2"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"404", "value":"2"
+            },
+            {
+                "name":"Over", "year":"404", "value":"6"
+            },
+            {
+                "name":"Under", "year":"404", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"408", "value":"6"
+            },
+            {
+                "name":"Over", "year":"408", "value":"7"
+            },
+            {
+                "name":"Under", "year":"408", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"412", "value":"5"
+            },
+            {
+                "name":"Over", "year":"412", "value":"3"
+            },
+            {
+                "name":"Under", "year":"412", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"416", "value":"2"
+            },
+            {
+                "name":"Over", "year":"416", "value":"5"
+            },
+            {
+                "name":"Under", "year":"416", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"420", "value":"5"
+            },
+            {
+                "name":"Over", "year":"420", "value":"4"
+            },
+            {
+                "name":"Under", "year":"420", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"424", "value":"2"
+            },
+            {
+                "name":"Over", "year":"424", "value":"0"
+            },
+            {
+                "name":"Under", "year":"424", "value":"3"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"428", "value":"2"
+            },
+            {
+                "name":"Over", "year":"428", "value":"0"
+            },
+            {
+                "name":"Under", "year":"428", "value":"1"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"432", "value":"0"
+            },
+            {
+                "name":"Over", "year":"432", "value":"6"
+            },
+            {
+                "name":"Under", "year":"432", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"436", "value":"0"
+            },
+            {
+                "name":"Over", "year":"436", "value":"3"
+            },
+            {
+                "name":"Under", "year":"436", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"441", "value":"0"
+            },
+            {
+                "name":"Over", "year":"441", "value":"6"
+            },
+            {
+                "name":"Under", "year":"441", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"445", "value":"1"
+            },
+            {
+                "name":"Over", "year":"445", "value":"3"
+            },
+            {
+                "name":"Under", "year":"445", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"449", "value":"1"
+            },
+            {
+                "name":"Over", "year":"449", "value":"5"
+            },
+            {
+                "name":"Under", "year":"449", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"453", "value":"2"
+            },
+            {
+                "name":"Over", "year":"453", "value":"1"
+            },
+            {
+                "name":"Under", "year":"453", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"457", "value":"1"
+            },
+            {
+                "name":"Over", "year":"457", "value":"6"
+            },
+            {
+                "name":"Under", "year":"457", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"461", "value":"3"
+            },
+            {
+                "name":"Over", "year":"461", "value":"1"
+            },
+            {
+                "name":"Under", "year":"461", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"465", "value":"0"
+            },
+            {
+                "name":"Over", "year":"465", "value":"3"
+            },
+            {
+                "name":"Under", "year":"465", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"469", "value":"2"
+            },
+            {
+                "name":"Over", "year":"469", "value":"1"
+            },
+            {
+                "name":"Under", "year":"469", "value":"0"
+            },
+            {
+                "name":"LaplaceDist : mu = 360.0, beta = 67.42942345924453", "year":"473", "value":"19"
+            },
+            {
+                "name":"Over", "year":"473", "value":"32"
+            },
+            {
+                "name":"Under", "year":"473", "value":"0"
+            },
+        ],
+        [
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"333", "value":"12"
+            },
+            {
+                "name":"Over", "year":"333", "value":"0"
+            },
+            {
+                "name":"Under", "year":"333", "value":"440"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"411", "value":"10"
+            },
+            {
+                "name":"Over", "year":"411", "value":"0"
+            },
+            {
+                "name":"Under", "year":"411", "value":"26"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"489", "value":"2"
+            },
+            {
+                "name":"Over", "year":"489", "value":"5"
+            },
+            {
+                "name":"Under", "year":"489", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"567", "value":"2"
+            },
+            {
+                "name":"Over", "year":"567", "value":"5"
+            },
+            {
+                "name":"Under", "year":"567", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"645", "value":"0"
+            },
+            {
+                "name":"Over", "year":"645", "value":"18"
+            },
+            {
+                "name":"Under", "year":"645", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"723", "value":"0"
+            },
+            {
+                "name":"Over", "year":"723", "value":"8"
+            },
+            {
+                "name":"Under", "year":"723", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"801", "value":"0"
+            },
+            {
+                "name":"Over", "year":"801", "value":"7"
+            },
+            {
+                "name":"Under", "year":"801", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"879", "value":"0"
+            },
+            {
+                "name":"Over", "year":"879", "value":"8"
+            },
+            {
+                "name":"Under", "year":"879", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"957", "value":"0"
+            },
+            {
+                "name":"Over", "year":"957", "value":"18"
+            },
+            {
+                "name":"Under", "year":"957", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1036", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1036", "value":"11"
+            },
+            {
+                "name":"Under", "year":"1036", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1114", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1114", "value":"5"
+            },
+            {
+                "name":"Under", "year":"1114", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1192", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1192", "value":"12"
+            },
+            {
+                "name":"Under", "year":"1192", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1270", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1270", "value":"16"
+            },
+            {
+                "name":"Under", "year":"1270", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1348", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1348", "value":"7"
+            },
+            {
+                "name":"Under", "year":"1348", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1426", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1426", "value":"6"
+            },
+            {
+                "name":"Under", "year":"1426", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1504", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1504", "value":"7"
+            },
+            {
+                "name":"Under", "year":"1504", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1582", "value":"1"
+            },
+            {
+                "name":"Over", "year":"1582", "value":"11"
+            },
+            {
+                "name":"Under", "year":"1582", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1661", "value":"1"
+            },
+            {
+                "name":"Over", "year":"1661", "value":"8"
+            },
+            {
+                "name":"Under", "year":"1661", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1739", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1739", "value":"12"
+            },
+            {
+                "name":"Under", "year":"1739", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1817", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1817", "value":"10"
+            },
+            {
+                "name":"Under", "year":"1817", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1895", "value":"0"
+            },
+            {
+                "name":"Over", "year":"1895", "value":"11"
+            },
+            {
+                "name":"Under", "year":"1895", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"1973", "value":"2"
+            },
+            {
+                "name":"Over", "year":"1973", "value":"6"
+            },
+            {
+                "name":"Under", "year":"1973", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2051", "value":"0"
+            },
+            {
+                "name":"Over", "year":"2051", "value":"7"
+            },
+            {
+                "name":"Under", "year":"2051", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2129", "value":"1"
+            },
+            {
+                "name":"Over", "year":"2129", "value":"4"
+            },
+            {
+                "name":"Under", "year":"2129", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2207", "value":"2"
+            },
+            {
+                "name":"Over", "year":"2207", "value":"7"
+            },
+            {
+                "name":"Under", "year":"2207", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2285", "value":"0"
+            },
+            {
+                "name":"Over", "year":"2285", "value":"14"
+            },
+            {
+                "name":"Under", "year":"2285", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2364", "value":"0"
+            },
+            {
+                "name":"Over", "year":"2364", "value":"8"
+            },
+            {
+                "name":"Under", "year":"2364", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2442", "value":"1"
+            },
+            {
+                "name":"Over", "year":"2442", "value":"8"
+            },
+            {
+                "name":"Under", "year":"2442", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2520", "value":"1"
+            },
+            {
+                "name":"Over", "year":"2520", "value":"8"
+            },
+            {
+                "name":"Under", "year":"2520", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2598", "value":"0"
+            },
+            {
+                "name":"Over", "year":"2598", "value":"8"
+            },
+            {
+                "name":"Under", "year":"2598", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2676", "value":"1"
+            },
+            {
+                "name":"Over", "year":"2676", "value":"4"
+            },
+            {
+                "name":"Under", "year":"2676", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2754", "value":"0"
+            },
+            {
+                "name":"Over", "year":"2754", "value":"5"
+            },
+            {
+                "name":"Under", "year":"2754", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2832", "value":"0"
+            },
+            {
+                "name":"Over", "year":"2832", "value":"4"
+            },
+            {
+                "name":"Under", "year":"2832", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2910", "value":"0"
+            },
+            {
+                "name":"Over", "year":"2910", "value":"8"
+            },
+            {
+                "name":"Under", "year":"2910", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"2989", "value":"0"
+            },
+            {
+                "name":"Over", "year":"2989", "value":"9"
+            },
+            {
+                "name":"Under", "year":"2989", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3067", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3067", "value":"11"
+            },
+            {
+                "name":"Under", "year":"3067", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3145", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3145", "value":"6"
+            },
+            {
+                "name":"Under", "year":"3145", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3223", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3223", "value":"13"
+            },
+            {
+                "name":"Under", "year":"3223", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3301", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3301", "value":"10"
+            },
+            {
+                "name":"Under", "year":"3301", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3379", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3379", "value":"5"
+            },
+            {
+                "name":"Under", "year":"3379", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3457", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3457", "value":"10"
+            },
+            {
+                "name":"Under", "year":"3457", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3535", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3535", "value":"7"
+            },
+            {
+                "name":"Under", "year":"3535", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3613", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3613", "value":"15"
+            },
+            {
+                "name":"Under", "year":"3613", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3692", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3692", "value":"8"
+            },
+            {
+                "name":"Under", "year":"3692", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3770", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3770", "value":"9"
+            },
+            {
+                "name":"Under", "year":"3770", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3848", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3848", "value":"9"
+            },
+            {
+                "name":"Under", "year":"3848", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"3926", "value":"0"
+            },
+            {
+                "name":"Over", "year":"3926", "value":"11"
+            },
+            {
+                "name":"Under", "year":"3926", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"4004", "value":"0"
+            },
+            {
+                "name":"Over", "year":"4004", "value":"7"
+            },
+            {
+                "name":"Under", "year":"4004", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"4082", "value":"0"
+            },
+            {
+                "name":"Over", "year":"4082", "value":"10"
+            },
+            {
+                "name":"Under", "year":"4082", "value":"0"
+            },
+            {
+                "name":"UniformDist : a = 299.0, b = 4692.0", "year":"4160", "value":"1"
+            },
+            {
+                "name":"Over", "year":"4160", "value":"50"
+            },
+            {
+                "name":"Under", "year":"4160", "value":"0"
+            },
+        ],
+        [
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"261", "value":"0"
+            },
+            {
+                "name":"Over", "year":"261", "value":"53"
+            },
+            {
+                "name":"Under", "year":"261", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"266", "value":"0"
+            },
+            {
+                "name":"Over", "year":"266", "value":"6"
+            },
+            {
+                "name":"Under", "year":"266", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"270", "value":"0"
+            },
+            {
+                "name":"Over", "year":"270", "value":"5"
+            },
+            {
+                "name":"Under", "year":"270", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"275", "value":"0"
+            },
+            {
+                "name":"Over", "year":"275", "value":"7"
+            },
+            {
+                "name":"Under", "year":"275", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"279", "value":"0"
+            },
+            {
+                "name":"Over", "year":"279", "value":"7"
+            },
+            {
+                "name":"Under", "year":"279", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"284", "value":"0"
+            },
+            {
+                "name":"Over", "year":"284", "value":"6"
+            },
+            {
+                "name":"Under", "year":"284", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"288", "value":"0"
+            },
+            {
+                "name":"Over", "year":"288", "value":"6"
+            },
+            {
+                "name":"Under", "year":"288", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"293", "value":"0"
+            },
+            {
+                "name":"Over", "year":"293", "value":"9"
+            },
+            {
+                "name":"Under", "year":"293", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"297", "value":"3"
+            },
+            {
+                "name":"Over", "year":"297", "value":"1"
+            },
+            {
+                "name":"Under", "year":"297", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"302", "value":"0"
+            },
+            {
+                "name":"Over", "year":"302", "value":"6"
+            },
+            {
+                "name":"Under", "year":"302", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"307", "value":"1"
+            },
+            {
+                "name":"Over", "year":"307", "value":"5"
+            },
+            {
+                "name":"Under", "year":"307", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"311", "value":"7"
+            },
+            {
+                "name":"Over", "year":"311", "value":"2"
+            },
+            {
+                "name":"Under", "year":"311", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"316", "value":"6"
+            },
+            {
+                "name":"Over", "year":"316", "value":"0"
+            },
+            {
+                "name":"Under", "year":"316", "value":"1"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"320", "value":"10"
+            },
+            {
+                "name":"Over", "year":"320", "value":"3"
+            },
+            {
+                "name":"Under", "year":"320", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"325", "value":"9"
+            },
+            {
+                "name":"Over", "year":"325", "value":"0"
+            },
+            {
+                "name":"Under", "year":"325", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"329", "value":"12"
+            },
+            {
+                "name":"Over", "year":"329", "value":"0"
+            },
+            {
+                "name":"Under", "year":"329", "value":"17"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"334", "value":"11"
+            },
+            {
+                "name":"Over", "year":"334", "value":"0"
+            },
+            {
+                "name":"Under", "year":"334", "value":"12"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"339", "value":"14"
+            },
+            {
+                "name":"Over", "year":"339", "value":"0"
+            },
+            {
+                "name":"Under", "year":"339", "value":"8"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"343", "value":"17"
+            },
+            {
+                "name":"Over", "year":"343", "value":"0"
+            },
+            {
+                "name":"Under", "year":"343", "value":"25"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"348", "value":"12"
+            },
+            {
+                "name":"Over", "year":"348", "value":"0"
+            },
+            {
+                "name":"Under", "year":"348", "value":"26"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"352", "value":"19"
+            },
+            {
+                "name":"Over", "year":"352", "value":"0"
+            },
+            {
+                "name":"Under", "year":"352", "value":"15"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"357", "value":"10"
+            },
+            {
+                "name":"Over", "year":"357", "value":"0"
+            },
+            {
+                "name":"Under", "year":"357", "value":"28"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"361", "value":"18"
+            },
+            {
+                "name":"Over", "year":"361", "value":"0"
+            },
+            {
+                "name":"Under", "year":"361", "value":"16"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"366", "value":"14"
+            },
+            {
+                "name":"Over", "year":"366", "value":"0"
+            },
+            {
+                "name":"Under", "year":"366", "value":"23"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"371", "value":"19"
+            },
+            {
+                "name":"Over", "year":"371", "value":"2"
+            },
+            {
+                "name":"Under", "year":"371", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"375", "value":"8"
+            },
+            {
+                "name":"Over", "year":"375", "value":"0"
+            },
+            {
+                "name":"Under", "year":"375", "value":"23"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"380", "value":"11"
+            },
+            {
+                "name":"Over", "year":"380", "value":"1"
+            },
+            {
+                "name":"Under", "year":"380", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"384", "value":"7"
+            },
+            {
+                "name":"Over", "year":"384", "value":"0"
+            },
+            {
+                "name":"Under", "year":"384", "value":"15"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"389", "value":"9"
+            },
+            {
+                "name":"Over", "year":"389", "value":"2"
+            },
+            {
+                "name":"Under", "year":"389", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"393", "value":"6"
+            },
+            {
+                "name":"Over", "year":"393", "value":"0"
+            },
+            {
+                "name":"Under", "year":"393", "value":"1"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"398", "value":"7"
+            },
+            {
+                "name":"Over", "year":"398", "value":"0"
+            },
+            {
+                "name":"Under", "year":"398", "value":"4"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"403", "value":"4"
+            },
+            {
+                "name":"Over", "year":"403", "value":"3"
+            },
+            {
+                "name":"Under", "year":"403", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"407", "value":"5"
+            },
+            {
+                "name":"Over", "year":"407", "value":"0"
+            },
+            {
+                "name":"Under", "year":"407", "value":"1"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"412", "value":"5"
+            },
+            {
+                "name":"Over", "year":"412", "value":"3"
+            },
+            {
+                "name":"Under", "year":"412", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"416", "value":"5"
+            },
+            {
+                "name":"Over", "year":"416", "value":"7"
+            },
+            {
+                "name":"Under", "year":"416", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"421", "value":"5"
+            },
+            {
+                "name":"Over", "year":"421", "value":"2"
+            },
+            {
+                "name":"Under", "year":"421", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"425", "value":"4"
+            },
+            {
+                "name":"Over", "year":"425", "value":"4"
+            },
+            {
+                "name":"Under", "year":"425", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"430", "value":"1"
+            },
+            {
+                "name":"Over", "year":"430", "value":"10"
+            },
+            {
+                "name":"Under", "year":"430", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"435", "value":"0"
+            },
+            {
+                "name":"Over", "year":"435", "value":"5"
+            },
+            {
+                "name":"Under", "year":"435", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"439", "value":"0"
+            },
+            {
+                "name":"Over", "year":"439", "value":"6"
+            },
+            {
+                "name":"Under", "year":"439", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"444", "value":"1"
+            },
+            {
+                "name":"Over", "year":"444", "value":"4"
+            },
+            {
+                "name":"Under", "year":"444", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"448", "value":"1"
+            },
+            {
+                "name":"Over", "year":"448", "value":"1"
+            },
+            {
+                "name":"Under", "year":"448", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"453", "value":"2"
+            },
+            {
+                "name":"Over", "year":"453", "value":"2"
+            },
+            {
+                "name":"Under", "year":"453", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"457", "value":"3"
+            },
+            {
+                "name":"Over", "year":"457", "value":"2"
+            },
+            {
+                "name":"Under", "year":"457", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"462", "value":"1"
+            },
+            {
+                "name":"Over", "year":"462", "value":"1"
+            },
+            {
+                "name":"Under", "year":"462", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"467", "value":"2"
+            },
+            {
+                "name":"Over", "year":"467", "value":"2"
+            },
+            {
+                "name":"Under", "year":"467", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"471", "value":"3"
+            },
+            {
+                "name":"Over", "year":"471", "value":"1"
+            },
+            {
+                "name":"Under", "year":"471", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"476", "value":"1"
+            },
+            {
+                "name":"Over", "year":"476", "value":"2"
+            },
+            {
+                "name":"Under", "year":"476", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"480", "value":"0"
+            },
+            {
+                "name":"Over", "year":"480", "value":"3"
+            },
+            {
+                "name":"Under", "year":"480", "value":"0"
+            },
+            {
+                "name":"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)", "year":"485", "value":"15"
+            },
+            {
+                "name":"Over", "year":"485", "value":"36"
+            },
+            {
+                "name":"Under", "year":"485", "value":"0"
+            },
+        ],
+    ];
+    var xTickValuesNested = [
+        [
+            "0",
+            "16",
+            "33",
+            "49",
+            "66",
+            "82",
+            "99",
+            "116",
+            "132",
+            "149",
+            "165",
+            "182",
+            "199",
+            "215",
+            "232",
+            "248",
+            "265",
+            "282",
+            "298",
+            "315",
+            "331",
+            "348",
+            "365",
+            "381",
+            "398",
+            "414",
+            "431",
+            "448",
+            "464",
+            "481",
+            "497",
+            "514",
+            "530",
+            "547",
+            "564",
+            "580",
+            "597",
+            "613",
+            "630",
+            "647",
+            "663",
+            "680",
+            "696",
+            "713",
+            "730",
+            "746",
+            "763",
+            "779",
+            "796",
+            "813",
+        ],
+        [
+            "273",
+            "277",
+            "281",
+            "285",
+            "290",
+            "294",
+            "298",
+            "302",
+            "306",
+            "310",
+            "314",
+            "318",
+            "322",
+            "326",
+            "330",
+            "334",
+            "339",
+            "343",
+            "347",
+            "351",
+            "355",
+            "359",
+            "363",
+            "367",
+            "371",
+            "375",
+            "379",
+            "383",
+            "387",
+            "392",
+            "396",
+            "400",
+            "404",
+            "408",
+            "412",
+            "416",
+            "420",
+            "424",
+            "428",
+            "432",
+            "436",
+            "441",
+            "445",
+            "449",
+            "453",
+            "457",
+            "461",
+            "465",
+            "469",
+            "473",
+        ],
+        [
+            "333",
+            "411",
+            "489",
+            "567",
+            "645",
+            "723",
+            "801",
+            "879",
+            "957",
+            "1036",
+            "1114",
+            "1192",
+            "1270",
+            "1348",
+            "1426",
+            "1504",
+            "1582",
+            "1661",
+            "1739",
+            "1817",
+            "1895",
+            "1973",
+            "2051",
+            "2129",
+            "2207",
+            "2285",
+            "2364",
+            "2442",
+            "2520",
+            "2598",
+            "2676",
+            "2754",
+            "2832",
+            "2910",
+            "2989",
+            "3067",
+            "3145",
+            "3223",
+            "3301",
+            "3379",
+            "3457",
+            "3535",
+            "3613",
+            "3692",
+            "3770",
+            "3848",
+            "3926",
+            "4004",
+            "4082",
+            "4160",
+        ],
+        [
+            "261",
+            "266",
+            "270",
+            "275",
+            "279",
+            "284",
+            "288",
+            "293",
+            "297",
+            "302",
+            "307",
+            "311",
+            "316",
+            "320",
+            "325",
+            "329",
+            "334",
+            "339",
+            "343",
+            "348",
+            "352",
+            "357",
+            "361",
+            "366",
+            "371",
+            "375",
+            "380",
+            "384",
+            "389",
+            "393",
+            "398",
+            "403",
+            "407",
+            "412",
+            "416",
+            "421",
+            "425",
+            "430",
+            "435",
+            "439",
+            "444",
+            "448",
+            "453",
+            "457",
+            "462",
+            "467",
+            "471",
+            "476",
+            "480",
+            "485",
+        ],
+    ];
+    var distributionInfo = [
+        {
+            name:"NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433"
+            ,"totalOver":"406.0"
+            ,"totalUnder":"406.0"
+            ,"totalDiff":"0.0"
+        },
+        {
+            name:"LaplaceDist : mu = 360.0, beta = 67.42942345924453"
+            ,"totalOver":"211.0"
+            ,"totalUnder":"211.0"
+            ,"totalDiff":"0.0"
+        },
+        {
+            name:"UniformDist : a = 299.0, b = 4692.0"
+            ,"totalOver":"466.0"
+            ,"totalUnder":"466.0"
+            ,"totalDiff":"0.0"
+        },
+        {
+            name:"Mixture Distribution: ( weight = 0.01507882523029544, NormalDist : mu = 409.9065606361829, sigma = 322.0531321029433) ( weight = 0.9483822245904204, LaplaceDist : mu = 360.0, beta = 67.42942345924453) ( weight = 0.03653895017928413, UniformDist : a = 299.0, b = 4692.0)"
+            ,"totalOver":"215.0"
+            ,"totalUnder":"215.0"
+            ,"totalDiff":"0.0"
+        },
+    ];
+    var nbOfBuckets = "50"
+    var list = document.getElementById('distrList');
 
-for(i = 0; i < dataNested.length; i++) {
+    for(i = 0; i < distributionInfo.length; i++) {
 
-    var li = document.createElement('li');
-    var container = document.createElement('div');
-    var row = document.createElement('div');
-    var col_1 = document.createElement('div');
-    var col_2 = document.createElement('div');
-    var entry = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    var par_name = document.createElement('P');
-    var par_totalOver = document.createElement('P');
-    var par_avgOver = document.createElement('P');
-    var par_totalUnder = document.createElement('P');
-    var par_avgUnder = document.createElement('P');
+        var li = document.createElement('li');
+        var container = document.createElement('div');
+        var row = document.createElement('div');
+        var col_1 = document.createElement('div');
+        var col_2 = document.createElement('div');
+        var entry = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        var par_name = document.createElement('P');
+        var par_totalOver = document.createElement('P');
+        var par_avgOver = document.createElement('P');
+        var par_totalUnder = document.createElement('P');
+        var par_avgUnder = document.createElement('P');
 
-    container.setAttribute("class", "container");
-    row.setAttribute("class", "row");
-    col_1.setAttribute("class", "col-md-auto");
-    col_2.setAttribute("class", "col-md-auto");
-    entry.setAttribute("width", "960");
-    entry.setAttribute("height", "500");
-    entry.id = "svg" + i;
-    par_name.innerText = distributionInfo[i].name;
-    par_name.setAttribute("style", "font-weight: bold");
-    par_totalOver.setAttribute("style", "color:green;");
-    par_totalOver.innerText = "Total Over: " + distributionInfo[i].totalOver;
-    par_avgOver.setAttribute("style", "color:green;");
-    par_avgOver.innerText = "Average Over: " + (distributionInfo[i].totalOver / nbOfBuckets);
-    par_totalUnder.setAttribute("style", "color:red;");
-    par_totalUnder.innerText = "Total Under: " + distributionInfo[i].totalUnder;
-    par_avgUnder.setAttribute("style", "color:red;");
-    par_avgUnder.innerText = "Average Under: " + (distributionInfo[i].totalUnder / nbOfBuckets);
+        container.setAttribute("class", "container");
+        row.setAttribute("class", "row");
+        col_1.setAttribute("class", "col-md-auto");
+        col_2.setAttribute("class", "col-md-auto");
+        entry.setAttribute("width", "2000");
+        entry.setAttribute("height", "500");
+        entry.id = "svg" + i;
+        par_name.innerText = distributionInfo[i].name;
+        par_name.setAttribute("style", "font-weight: bold");
+        par_totalOver.setAttribute("style", "color:green;");
+        par_totalOver.innerText = "Total Over: " + distributionInfo[i].totalOver;
+        par_avgOver.setAttribute("style", "color:green;");
+        par_avgOver.innerText = "Average Over: " + (distributionInfo[i].totalOver / nbOfBuckets);
+        par_totalUnder.setAttribute("style", "color:red;");
+        par_totalUnder.innerText = "Total Under: " + distributionInfo[i].totalUnder;
+        par_avgUnder.setAttribute("style", "color:red;");
+        par_avgUnder.innerText = "Average Under: " + (distributionInfo[i].totalUnder / nbOfBuckets);
 
-    list.appendChild(li);
-    li.appendChild(container);
-    container.appendChild(row);
-    row.appendChild(col_1);
-    row.appendChild(col_2);
-    col_1.appendChild(entry);
-    col_2.appendChild(par_name);
-    col_2.appendChild(par_totalOver);
-    col_2.appendChild(par_avgOver);
-    col_2.appendChild(par_totalUnder);
-    col_2.appendChild(par_avgUnder);
+        list.appendChild(li);
+        li.appendChild(container);
+        container.appendChild(row);
+        row.appendChild(col_1);
+        row.appendChild(col_2);
+        col_1.appendChild(entry);
+        col_2.appendChild(par_name);
+        col_2.appendChild(par_totalOver);
+        col_2.appendChild(par_avgOver);
+        col_2.appendChild(par_totalUnder);
+        col_2.appendChild(par_avgUnder);
 
-<!--li.appendChild(entry);-->
-<!--list.appendChild(li);-->
-}
+        <!--li.appendChild(entry);-->
+        <!--list.appendChild(li);-->
+    }
 
-var width = 960, height = 500;
+    var colorsArray = ["green", "red", "blue"];
 
-for(j = 0; j < dataNested.length; j++) {
-var data = dataNested[j];
-var width = 960, height = 500;
+    var width = 2000, height = 500;
 
-var margin = ({top: 10, right: 10, bottom: 20, left: 40});
+    var margin = ({top: 20, right: 30, bottom: 30, left: 30});
 
-formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
+    for(j = 0; j < distributionInfo.length; j++) {
 
-var series = d3.stack()
-.keys(columns)
-(data)
-.map(d => (d.forEach(v => v.key = d.key), d));
+        var colors = new Map([
+            ["Over", colorsArray[0]],
+            ["Under", colorsArray[1]],
+            [distributionInfo[j].name, colorsArray[2]]
+        ]);
 
-var color = d3.scaleOrdinal()
-.domain(series.map(d => d.key))
-.range(["#0066ff","#00cc00","#ff0000"])
-.unknown("#ccc");
+        var color = d3.scaleOrdinal()
+            .domain(Array.from(colors.keys()))
+            .range(Array.from(colors.values()));
 
-x = d3.scaleBand()
-.domain(data.map(d => d.name))
-.range([margin.left, width - margin.right])
-.padding(0.1);
+        var data = dataNested[j];
 
-y = d3.scaleLinear()
-.domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
-.rangeRound([height - margin.bottom, margin.top]);
+        formatTicks = x => (x == xTickValuesNested[j][0])
+            ? ("<=" + x)
+            : ((x == xTickValuesNested[j][nbOfBuckets - 1])
+                ? (">=" + x)
+                : `${x + ""}`);
 
-xAxis = g => g
-.attr("transform", `translate(0,${height - margin.bottom})`)
-.call(d3.axisBottom(x).tickSizeOuter(0))
-.call(g => g.selectAll(".domain").remove());
+        formatTicksInArr = x => x.map(function(val, index){
+            return val+1;
+        })
 
-yAxis = g => g
-.attr("transform", `translate(${margin.left},0)`)
-.call(d3.axisLeft(y).ticks(null, "s"))
-.call(g => g.selectAll(".domain").remove());
+        formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
 
-const svg = d3.select("#svg"+j).attr("viewBox", [0, 0, width, height]);
+        series = d3.stack()
+            .keys(Array.from(colors.keys()))
+            .value((group, key) => group.get(key).value)
+    .order(d3.stackOrderReverse)
+        (Array.from(d3.rollup(data, ([d]) => d, d => d.year, d => d.name).values()))
+    .map(s => (s.forEach(d => d.data = d.data.get(s.key)), s));
 
-svg.append("g")
-.selectAll("g")
-.data(series)
-.join("g")
-.attr("fill", d => color(d.key))
-.selectAll("rect")
-.data(d => d)
-.join("rect")
-.attr("x", (d, i) => x(d.data.name))
-.attr("y", d => y(d[1]))
-.attr("height", d => y(d[0]) - y(d[1]))
-.attr("width", x.bandwidth())
-.append("title")
-.text(d => `${d.data.name} ${d.key}
-${formatValue(d.data[d.key])}`);
+        x = d3.scaleBand()
+            .domain(data.map(d => d.year))
+    .rangeRound([margin.left, width - margin.right]);
 
-svg.append("g")
-.call(xAxis);
+        y = d3.scaleLinear()
+            .domain([0, d3.max(series, d => d3.max(d, d => d[1]))]).nice()
+            .range([height - margin.bottom, margin.top]);
 
-svg.append("g")
-.call(yAxis);
-}
+        xAxis = g => g
+            .attr("transform", `translate(0,${height - margin.bottom})`)
+            .call(d3.axisBottom(x)
+                .tickValues(xTickValuesNested[j])
+                .tickFormat(formatTicks)
+                .tickSizeOuter(0));
+
+        yAxis = g => g
+            .attr("transform", `translate(${margin.left},0)`)
+            .call(d3.axisLeft(y)
+                .tickFormat(x => (x).toFixed(0)))
+    .call(g => g.select(".domain").remove())
+    .call(g => g.select(".tick:last-of-type text").clone()
+            .attr("x", 3)
+            .attr("text-anchor", "start")
+            .attr("font-weight", "bold")
+            .text(data.y));
+
+        formatRevenue = x => (+(x / 1e9).toFixed(2) >= 1)
+            ? `${(x / 1e9).toFixed(2)}B`
+            : `${(x / 1e6).toFixed(0)}M`;
+
+        const svg = d3.select("#svg"+j).attr("viewBox", [0, 0, width, height]);
+
+        svg.append("g")
+            .selectAll("g")
+            .data(series)
+            .join("g")
+            .attr("fill", ({key}) => color(key))
+    .call(g => g.selectAll("rect")
+            .data(d => d)
+    .join("rect")
+            .attr("x", d => x(d.data.year))
+    .attr("y", d => y(d[1]))
+    .attr("width", x.bandwidth() - 1)
+            .attr("height", d => y(d[0]) - y(d[1]))
+    .append("title")
+            .text(d => `${d.data.name}: ${(d.data.value)} samples are ${formatTicks(d.data.year)}`));
+
+        svg.append("g")
+            .call(xAxis);
+
+        svg.append("g")
+            .call(yAxis);
+    }
 </script>
 </html>

@@ -82,25 +82,15 @@ public class LogsAndDistr {
         double[] totalOver = new double[n];
         double[] totalUnder = new double[n];
 
-        double[] xTickValues = new double[nbOfBuckets];
+        int[] xTickValues = new int[nbOfBuckets];
 
-        double[][] xTickValuesNested = new double[distributionList.size()][nbOfBuckets];
-
-//        var data = [
-//        {name: "8 - Track", year: 1973.4, value: 26},
-//        {name: "8 - Track", year: 1974.322, value: 17},
-//        {name: "Cassette", year: 1973.4, value: 41},
-//        {name: "Cassette", year: 1974.322, value: 2} ];
+        int[][] xTickValuesNested = new int[distributionList.size()][nbOfBuckets];
 
         frontLines.add("var dataNested = [");
 
         for (int i = 0; i < distributionList.size(); i++) {
             ContinuousDistribution distribution = distributionList.get(i);
             double[] samplesFromDistr = new double[n];
-
-            List<Double> samplesFromDistrBuckets = new ArrayList<>();
-            List<Double> over = new ArrayList<>();
-            List<Double> under = new ArrayList<>();
 
             for (int j = 0; j < n; j++) {
                 samplesFromDistr[j] = distribution.inverseF(Math.random());
@@ -114,45 +104,34 @@ public class LogsAndDistr {
             double minVal = Math.max(Math.min(dataArray[n/10], samplesFromDistr[n/10]), 0);
             double maxVal = Math.max(dataArray[n * 9 / 10], samplesFromDistr[n * 9 / 10]);
 
+            if(maxVal - minVal < 50) {
+                maxVal += 50;
+                System.out.println("Adjusting tickvalues...");
+                //ensure that the distance between tickValues is >1.
+            }
+
             System.out.println(minVal + " minval and " + maxVal + " maxval.");
 
-            xTickValues[0] = minVal;
-            xTickValues[nbOfBuckets - 1] = maxVal;
+            xTickValues[0] = (int) minVal;
+            xTickValues[nbOfBuckets - 1] = (int) maxVal;
 
-            xTickValuesNested[i][0] = minVal;
-            xTickValuesNested[i][nbOfBuckets - 1] = maxVal;
+            xTickValuesNested[i][0] = (int) minVal;
+            xTickValuesNested[i][nbOfBuckets - 1] = (int) maxVal;
 
             double tickDistance = (maxVal - minVal) * (1.0 / (nbOfBuckets - 1));
 
             for (int j = 1; j < nbOfBuckets - 1; j++) {
-                xTickValues[j] = minVal + (maxVal - minVal) * ((double) j / (nbOfBuckets - 1));
+                xTickValues[j] = (int) (minVal + (maxVal - minVal) * ((double) j / (nbOfBuckets - 1)));
                 xTickValuesNested[i][j] = xTickValues[j];
             }
 
             for (int j = 0; j < n; j++) {
 
-                int bucketForDataArr = (int) ((dataArray[j] - minVal) / tickDistance);
+                determineBucketCounts(nbOfBuckets, dataArray, dataArrayYValues, minVal, tickDistance, j);
 
-                if (bucketForDataArr < 0) {
-                    dataArrayYValues[0]++;
-                } else if (bucketForDataArr > nbOfBuckets - 1) {
-                    dataArrayYValues[nbOfBuckets - 1]++;
-                } else {
-                    dataArrayYValues[bucketForDataArr]++;
-                }
-
-                int bucketForSampleDistr = (int) ((samplesFromDistr[j] - minVal) / tickDistance);
-
-                if (bucketForSampleDistr < 0) {
-                    distributionYValues[0]++;
-                } else if (bucketForSampleDistr > nbOfBuckets - 1) {
-                    distributionYValues[nbOfBuckets - 1]++;
-                } else {
-                    distributionYValues[bucketForSampleDistr]++;
-                }
+                determineBucketCounts(nbOfBuckets, samplesFromDistr, distributionYValues, minVal, tickDistance, j);
             }
 
-            //{name: "8 - Track", year: 1973.4, value: 26},
             frontLines.add("[");
             for (int j = 0; j < nbOfBuckets; j++) {
                 int dataArrayYValue = dataArrayYValues[j];
@@ -176,17 +155,17 @@ public class LogsAndDistr {
 
                 frontLines.add("{");
                 frontLines.add("\"name\":\"" + distribution.toString() +
-                        "\", \"year\":\"" + xTickValues[j] +
+                        "\", \"tickVal\":\"" + xTickValues[j] +
                         "\", \"value\":\"" + distributionYValue + "\"");
                 frontLines.add("},");
                 frontLines.add("{");
                 frontLines.add("\"name\":\"Over" +
-                        "\", \"year\":\"" + xTickValues[j] +
+                        "\", \"tickVal\":\"" + xTickValues[j] +
                         "\", \"value\":\"" + overValue + "\"");
                 frontLines.add("},");
                 frontLines.add("{");
                 frontLines.add("\"name\":\"Under" +
-                        "\", \"year\":\"" + xTickValues[j] +
+                        "\", \"tickVal\":\"" + xTickValues[j] +
                         "\", \"value\":\"" + underValue + "\"");
                 frontLines.add("},");
             }
@@ -216,8 +195,18 @@ public class LogsAndDistr {
         frontLines.add("];");
 
         frontLines.add("var nbOfBuckets = \"" + nbOfBuckets + "\"");
+    }
 
-        frontLines.add("var columns = [\"distribution\", \"over\", \"under\"];");
+    private static void determineBucketCounts(int nbOfBuckets, double[] samplesFromDistr, int[] distributionYValues, double minVal, double tickDistance, int j) {
+        int bucketForSampleDistr = (int) ((samplesFromDistr[j] - minVal) / tickDistance);
+
+        if (bucketForSampleDistr < 0) {
+            distributionYValues[0]++;
+        } else if (bucketForSampleDistr > nbOfBuckets - 1) {
+            distributionYValues[nbOfBuckets - 1]++;
+        } else {
+            distributionYValues[bucketForSampleDistr]++;
+        }
     }
 
     public static void runForSomeTimeAndGenerateLogsOnHeroku() throws InterruptedException,
