@@ -21,51 +21,13 @@
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-<!--<script>-->
-
-    <!--identity(x) {-->
-        <!--return x;-->
-    <!--}-->
-
-    <!--function rollup(values, reduce, ...keys) {-->
-        <!--return nest(values, identity, reduce, keys);-->
-    <!--}-->
-
-    <!--function nest(values, map, reduce, keys) {-->
-        <!--return (function regroup(values, i) {-->
-            <!--if (i >= keys.length) return reduce(values);-->
-            <!--const groups = new Map();-->
-            <!--const keyof = keys[i++];-->
-            <!--let index = -1;-->
-            <!--for (const value of values) {-->
-                <!--const key = keyof(value, ++index, values);-->
-                <!--const group = groups.get(key);-->
-                <!--if (group) group.push(value);-->
-                <!--else groups.set(key, [value]);-->
-            <!--}-->
-            <!--for (const [key, values] of groups) {-->
-                <!--groups.set(key, regroup(values, i));-->
-            <!--}-->
-            <!--return map(groups);-->
-        <!--})(values, 0);-->
-    <!--}-->
-<!--</script>-->
 
 <script>
 var data = [
-    {name: "8 - Track", year: 1973, value: 2699600000},
-    {name: "8 - Track", year: 1974, value: 2730600000},
-    {name: "Cassette", year: 1973, value: 419600000},
-    {name: "Cassette", year: 1974, value: 1691000000} ];
-
-var colors = new Map([
-    ["8 - Track", "#5B8DB8"],
-    ["Cassette", "#7AAAD0"],
-]);
-
-var color = d3.scaleOrdinal()
-    .domain(Array.from(colors.keys()))
-    .range(Array.from(colors.values()))
+    {name: "8 - Track", year: 1973.4, value: 0},
+    {name: "8 - Track", year: 1974.322, value: 2730600000},
+    {name: "Cassette", year: 1973.4, value: 419600000},
+    {name: "Cassette", year: 1974.322, value: 1691000000} ];
 
 var distributionInfo = [
     {
@@ -94,6 +56,7 @@ var distributionInfo = [
     },
 ];
 
+var colorsArray = d3.schemeSpectral[3];
 
 var nbOfBuckets = "50";
 var columns = ["distribution", "over", "under"];
@@ -153,6 +116,21 @@ var margin = ({top: 20, right: 30, bottom: 30, left: 30});
 
 for(j = 0; j < 2; j++) {
 
+    var colors = new Map([
+        ["8 - Track", "#5B8DB8"],
+        ["Cassette", "#7AAAD0"],
+    ]);
+
+    // var colors = new Map([
+    //     [distributionInfo[j].name, colorsArray[0]],
+    //     ["Over", colorsArray[1]],
+    //     ["Under", colorsArray[2]]
+    // ]);
+
+    var color = d3.scaleOrdinal()
+        .domain(Array.from(colors.keys()))
+        .range(Array.from(colors.values()));
+
 // var data = dataNested[j];
 
 formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
@@ -175,7 +153,7 @@ formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
     xAxis = g => g
         .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(x)
-            .tickValues([1973, 1974])
+            .tickValues([1973.4, 1974.322])
         .tickSizeOuter(0));
 
     yAxis = g => g
