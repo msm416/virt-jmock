@@ -14,13 +14,11 @@ import org.jmock.internal.StateMachine;
 public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher {
     private final Collection<Expectation> expectations;
     private final Collection<StateMachine> stateMachines;
-    private double singleVirtualTime = 0d;
-    private Map<String, List<Double>> singleVirtualTimePerComponent= new HashMap<>();
+
+    private SingleContextIteration singleContextIteration = new SingleContextIteration();
+    private List<SingleContextIteration> multipleSingleContextIterations;
 
     private double singleRealTime = 0d;
-
-    private List<Double> multipleVirtualTimes;
-    private Map<String, List<Double>> multipleVirtualTimesPerComponent;
 
     private int repeatCounter = 1;
 
@@ -125,14 +123,11 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                     if(invocationExpectation.getPerformanceModel() != null) {
                         //double sample = invocationExpectation.getPerformanceModel().sample();
                         double sample = invocationExpectation.getPerformanceModel().inverseF(Math.random());
-                        singleVirtualTime += sample;
 
-                        String methodName = invocation.getInvokedMethod().toString(); // TODO: determine right name ?????
-                        if(singleVirtualTimePerComponent.containsKey(methodName)) {
-                            singleVirtualTimePerComponent.get(methodName).add(sample);
-                        } else {
-                            singleVirtualTimePerComponent.put(methodName, new ArrayList() {{add(sample);}});
-                        }
+                        String methodName = invocation.getInvokedMethod().toString();
+
+                        singleContextIteration.addComponent(methodName, sample);
+
                         //System.out.println("WE SAMPLED: " + sample);
                     }
                 } catch (Exception ignored) {
@@ -152,45 +147,30 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     }
 
     @Override
-    public double getSingleVirtualTime(boolean resetVirtualTime){
-        double TVT = singleVirtualTime;
+    public SingleContextIteration getSingleContextIteration(boolean resetSingleContextIteration) {
+        SingleContextIteration SCI = singleContextIteration;
 
-        if(resetVirtualTime) {
-            singleVirtualTime = 0;
+        if(resetSingleContextIteration) {
+            singleContextIteration = new SingleContextIteration();
         }
 
-        return TVT;
+        return SCI;
     }
 
     @Override
-    public Map<String, List<Double>> getSingleVirtualTimePerComponent(boolean resetVirtualTime){
-        Map<String, List<Double>> SVTPC = singleVirtualTimePerComponent;
+    public void setMultipleSingleContextIterations(List<SingleContextIteration> multipleSingleContextIterations) {
+        this.multipleSingleContextIterations = multipleSingleContextIterations;
+    }
 
-        if(resetVirtualTime) {
-            singleVirtualTimePerComponent = new HashMap<>();
+    @Override
+    public List<SingleContextIteration> getMultipleSingleContextIterations(boolean resetMultipleContextIterations) {
+        List<SingleContextIteration> MSCI = multipleSingleContextIterations;
+
+        if(resetMultipleContextIterations) {
+            multipleSingleContextIterations = new ArrayList<>();
         }
 
-        return SVTPC;
-    }
-
-    @Override
-    public void setMultipleVirtualTimes(List<Double> virtualTimes) {
-        this.multipleVirtualTimes = virtualTimes;
-    }
-
-    @Override
-    public void setMultipleVirtualTimesPerComponent(Map<String, List<Double>> virtualTimesPerComponent) {
-        this.multipleVirtualTimesPerComponent = virtualTimesPerComponent;
-    }
-
-    @Override
-    public List<Double> getMultipleVirtualTimes() {
-        return multipleVirtualTimes;
-    }
-
-    @Override
-    public Map<String, List<Double>> getMultipleVirtualTimesPerComponent() {
-        return multipleVirtualTimesPerComponent;
+        return MSCI;
     }
 
     public double getSingleRealTime() {

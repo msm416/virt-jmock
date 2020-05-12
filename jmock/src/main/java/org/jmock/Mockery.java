@@ -277,19 +277,17 @@ public class Mockery implements SelfDescribing {
     }
 
     public void repeat(int counter, Runnable procedure) {
-        List<Double> virtualTimes = new ArrayList<>(counter);
-        Map<String, List<Double>> virtualTimesPerComponent = new HashMap<>();
+        List<InvocationDispatcher.SingleContextIteration> singleContextIterations = new ArrayList<>();
+
         for (int i = 0; i < counter; i++) {
             procedure.run();
-            virtualTimes.add(getSingleVirtualTime(true));
-            getSingleVirtualTimePerComponent(true).forEach((k, v) -> virtualTimesPerComponent.merge(k, v,
-                    ((a, b) -> Stream.concat(a.stream(), b.stream())
-                            .collect(Collectors.toList()))));
+
+            singleContextIterations.add(dispatcher.getSingleContextIteration(true));
         }
 
         dispatcher.setRepeatCounter(counter);
-        dispatcher.setMultipleVirtualTimes(virtualTimes);
-        dispatcher.setMultipleVirtualTimesPerComponent(virtualTimesPerComponent);
+
+        dispatcher.setMultipleSingleContextIterations(singleContextIterations);
     }
 
     private ExpectationError mismatchDescribing(final ExpectationError e) {
@@ -308,14 +306,7 @@ public class Mockery implements SelfDescribing {
      * (resetVirtualTime should be true when reusing the same JUnitRuleMockery @Rule as context).
      */
     public double getSingleVirtualTime(boolean resetVirtualTime) {
-        double TVT = dispatcher.getSingleVirtualTime(resetVirtualTime);
-        //System.out.println("Total virtual time: " + TVT);
-        return TVT;
-    }
-
-    public Map<String, List<Double>> getSingleVirtualTimePerComponent(boolean resetVirtualTime) {
-        Map<String, List<Double>> SVTPC = dispatcher.getSingleVirtualTimePerComponent(resetVirtualTime);
-        return SVTPC;
+        return dispatcher.getSingleContextIteration(resetVirtualTime).totalVirtualTime;
     }
 
     public double getSingleRealTime() {
@@ -325,11 +316,10 @@ public class Mockery implements SelfDescribing {
     }
 
     public List<Double> getMultipleVirtualTimes() {
-        return dispatcher.getMultipleVirtualTimes();
-    }
-
-    public Map<String, List<Double>> getMultipleVirtualTimesPerComponent() {
-        return dispatcher.getMultipleVirtualTimesPerComponent();
+        return dispatcher.getMultipleSingleContextIterations(true)
+                .stream()
+                .map(a -> a.totalVirtualTime)
+                .collect(Collectors.toList());
     }
 
     private class MockObject implements Invokable, CaptureControl {
@@ -382,46 +372,46 @@ public class Mockery implements SelfDescribing {
     }
 
     private void writeMidSectionHTML(List<String> frontLines, Path filePath) throws IOException {
-        Map<String, List<Double>> mvtpc = dispatcher.getMultipleVirtualTimesPerComponent();
-        List<Map<String, String>> data = new ArrayList<>();
-        int numOfBuckets = Math.min(50,dispatcher.getRepeatCounter());
-        for(int i = 0; i < numOfBuckets; i++) {
-            int finalI = i;
-            data.add(new HashMap() {{put("name", "bucket" + finalI);}});
-        }
-        for (Map.Entry<String, List<Double>> comp : mvtpc.entrySet()) {
-            //String compName = "\"met" + comp.getKey().length() + "\"";
-            String compName = "\"" + comp.getKey() + "\"";
-            List<Double> compSamples = comp.getValue();
-            double coef = ((double) compSamples.size()) / dispatcher.getRepeatCounter();
-            int bucketSize = compSamples.size() / numOfBuckets;
-            for(int i = 0; i < numOfBuckets; i++) {
-                int avgCompSample = 0;
-                for (int j = (i * bucketSize); j < ((i + 1) * bucketSize); j++) {
-                    avgCompSample += compSamples.get(j);
-                }
-                data.get(i).put(compName, "" + ((avgCompSample/bucketSize) * coef));
-            }
-        }
-        List<String> columns = new ArrayList<>();
-        frontLines.add("var data = " + "[");
-        //frontLines.add("var data = " + data + ";");
-        for (Map<String, String> percentileContent : data) {
-            frontLines.add("{");
-            for (Map.Entry<String, String> entry : percentileContent.entrySet()) {
-                String key = entry.getKey();
-                String val = entry.getValue();
-                if (columns.size() < percentileContent.size() - 1) {
-                    if (!key.equals("name")) {
-                        columns.add(key);
-                    }
-                }
-                frontLines.add(key + ":\"" + val + "\",");
-            }
-            frontLines.add("},");
-        }
-        frontLines.add("];");
-        frontLines.add("var columns = " + columns + ";");
+//        Map<String, List<Double>> mvtpc = dispatcher.getMultipleVirtualTimesPerComponent();
+//        List<Map<String, String>> data = new ArrayList<>();
+//        int numOfBuckets = Math.min(50,dispatcher.getRepeatCounter());
+//        for(int i = 0; i < numOfBuckets; i++) {
+//            int finalI = i;
+//            data.add(new HashMap() {{put("name", "bucket" + finalI);}});
+//        }
+//        for (Map.Entry<String, List<Double>> comp : mvtpc.entrySet()) {
+//            //String compName = "\"met" + comp.getKey().length() + "\"";
+//            String compName = "\"" + comp.getKey() + "\"";
+//            List<Double> compSamples = comp.getValue();
+//            double coef = ((double) compSamples.size()) / dispatcher.getRepeatCounter();
+//            int bucketSize = compSamples.size() / numOfBuckets;
+//            for(int i = 0; i < numOfBuckets; i++) {
+//                int avgCompSample = 0;
+//                for (int j = (i * bucketSize); j < ((i + 1) * bucketSize); j++) {
+//                    avgCompSample += compSamples.get(j);
+//                }
+//                data.get(i).put(compName, "" + ((avgCompSample/bucketSize) * coef));
+//            }
+//        }
+//        List<String> columns = new ArrayList<>();
+//        frontLines.add("var data = " + "[");
+//        //frontLines.add("var data = " + data + ";");
+//        for (Map<String, String> percentileContent : data) {
+//            frontLines.add("{");
+//            for (Map.Entry<String, String> entry : percentileContent.entrySet()) {
+//                String key = entry.getKey();
+//                String val = entry.getValue();
+//                if (columns.size() < percentileContent.size() - 1) {
+//                    if (!key.equals("name")) {
+//                        columns.add(key);
+//                    }
+//                }
+//                frontLines.add(key + ":\"" + val + "\",");
+//            }
+//            frontLines.add("},");
+//        }
+//        frontLines.add("];");
+//        frontLines.add("var columns = " + columns + ";");
     }
 
 }
