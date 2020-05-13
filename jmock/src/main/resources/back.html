@@ -86,7 +86,7 @@ svg.append("g")
 .attr("width", x.bandwidth() - 1)
 .attr("height", d => y(d[0]) - y(d[1]))
 .append("title")
-.text(d => `${d.data.name}: ${(d.data.value)} samples are approx. ${formatTicks(d.data.tickVal)}`));
+.text(d => `${d.data.name}: ${(d.data.value)} calls are within approx. ${formatTicks(d.data.tickVal)}`));
 
 svg.append("g")
 .call(xAxis);
