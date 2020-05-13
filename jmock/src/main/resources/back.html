@@ -5,8 +5,8 @@ var margin = ({top: 20, right: 30, bottom: 30, left: 30});
 var nbOfComponents = componentNames.length;
 
 var colorsArray = (nbOfComponents < 3
-? ["green", "red", "blue"].slice(3 - nbOfComponents)
-: d3.schemeSpectral(nbOfComponents));
+? ["red", "green", "blue"].slice(3 - nbOfComponents)
+: Array.from({length: nbOfComponents}, () => "#" + ('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)));
 
 var colors = new Map(
 
