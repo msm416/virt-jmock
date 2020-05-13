@@ -42,6 +42,6 @@ public class RepeatTest {
 
         });
 
-        assertThat(context.getMultipleVirtualTimes(), hasPercentile(80, lessThan(2000.0)));
+        assertThat(context.getMultipleVirtualTimes(false), hasPercentile(80, lessThan(2000.0)));
     }
 }

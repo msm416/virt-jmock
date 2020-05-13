@@ -1,88 +1,98 @@
-var width = 960, height = 500;
+var width = 2000, height = 500;
 
-var margin = ({top: 10, right: 10, bottom: 20, left: 40});
+var margin = ({top: 20, right: 30, bottom: 30, left: 30});
+
+var nbOfComponents = componentNames.length;
+
+var colorsArray = (nbOfComponents < 3
+? ["green", "red", "blue"].slice(3 - nbOfComponents)
+: d3.schemeSpectral(nbOfComponents));
+
+var colors = new Map(
+
+componentNames.map(function(e, i) {
+return [e, colorsArray[i]];
+})
+
+);
+
+var color = d3.scaleOrdinal()
+.domain(Array.from(colors.keys()))
+.range(Array.from(colors.values()));
+
+var data = dataNested;
+
+formatTicks = x => (x == xTickValues[0])
+? ("<=" + x)
+: ((x == xTickValues[nbOfBuckets - 1])
+? (">=" + x)
+: `${x + ""}`);
+
+formatTicksInArr = x => x.map(function(val, index){
+return val+1;
+})
 
 formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
 
-var series = d3.stack()
-.keys(columns)
-(data)
-.map(d => (d.forEach(v => v.key = d.key), d));
-
-var color = d3.scaleOrdinal()
-.domain(series.map(d => d.key))
-.range(d3.schemeBrBG[series.length+2])
-.unknown("#ccc");
+series = d3.stack()
+.keys(Array.from(colors.keys()))
+.value((group, key) => group.get(key).value)
+.order(d3.stackOrderReverse)
+(Array.from(d3.rollup(data, ([d]) => d, d => d.tickVal, d => d.name).values()))
+.map(s => (s.forEach(d => d.data = d.data.get(s.key)), s));
 
 x = d3.scaleBand()
-.domain(data.map(d => d.name))
-.range([margin.left, width - margin.right])
-.padding(0.1);
+.domain(data.map(d => d.tickVal))
+.rangeRound([margin.left, width - margin.right]);
 
 y = d3.scaleLinear()
-.domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
-.rangeRound([height - margin.bottom, margin.top]);
+.domain([0, d3.max(series, d => d3.max(d, d => d[1]))]).nice()
+.range([height - margin.bottom, margin.top]);
 
 xAxis = g => g
 .attr("transform", `translate(0,${height - margin.bottom})`)
-.call(d3.axisBottom(x).tickSizeOuter(0))
-.call(g => g.selectAll(".domain").remove());
+.call(d3.axisBottom(x)
+.tickValues(xTickValues)
+.tickFormat(formatTicks)
+.tickSizeOuter(0));
 
 yAxis = g => g
 .attr("transform", `translate(${margin.left},0)`)
-.call(d3.axisLeft(y).ticks(null, "s"))
-.call(g => g.selectAll(".domain").remove());
+.call(d3.axisLeft(y)
+.tickFormat(x => (x).toFixed(0)))
+.call(g => g.select(".domain").remove())
+.call(g => g.select(".tick:last-of-type text").clone()
+.attr("x", 3)
+.attr("text-anchor", "start")
+.attr("font-weight", "bold")
+.text(data.y));
 
-const svg = d3.select("svg")
-.attr("viewBox", [0, 0, width, height]);
+formatRevenue = x => (+(x / 1e9).toFixed(2) >= 1)
+? `${(x / 1e9).toFixed(2)}B`
+: `${(x / 1e6).toFixed(0)}M`;
+
+const svg = d3.select("svg").attr("viewBox", [0, 0, width, height]);
 
 svg.append("g")
 .selectAll("g")
 .data(series)
 .join("g")
-.attr("fill", d => color(d.key))
-.selectAll("rect")
+.attr("fill", ({key}) => color(key))
+.call(g => g.selectAll("rect")
 .data(d => d)
 .join("rect")
-.attr("x", (d, i) => x(d.data.name))
+.attr("x", d => x(d.data.tickVal))
 .attr("y", d => y(d[1]))
+.attr("width", x.bandwidth() - 1)
 .attr("height", d => y(d[0]) - y(d[1]))
-.attr("width", x.bandwidth())
 .append("title")
-.text(d => `${d.data.name} ${d.key}
-${formatValue(d.data[d.key])}`);
+.text(d => `${d.data.name}: ${(d.data.value)} samples are approx. ${formatTicks(d.data.tickVal)}`));
 
 svg.append("g")
 .call(xAxis);
 
 svg.append("g")
 .call(yAxis);
-
-<!--// add legend-->
-
-<!--var sequentialScale = d3.schemeSpectral[series.length];-->
-
-<!--svg.append("g")-->
-<!--.attr("class", "legendSequential")-->
-<!--.attr("transform", "translate(20,20)");-->
-
-<!--// var legendSequential = legend.color-->
-<!--//     .shapeWidth(30)-->
-<!--//     .cells(10)-->
-<!--//     .orient("horizontal")-->
-<!--//     .scale(sequentialScale);-->
-
-<!--svg.select(".legendSequential")-->
-<!--.call(legend({-->
-<!--color: d3.scaleSequential([0, 100], d3.interpolateViridis),-->
-<!--title: "Temperature (°F)"-->
-<!--}));-->
-
-<!--// svg.node()-->
-<!--legend({-->
-<!--color: d3.scaleSequential([0, 100], d3.interpolateViridis),-->
-<!--title: "Temperature (°F)"-->
-<!--})-->
 
 </script>
 </html>

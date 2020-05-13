@@ -127,9 +127,9 @@ public class LogsAndDistr {
 
             for (int j = 0; j < n; j++) {
 
-                determineBucketCounts(nbOfBuckets, dataArray, dataArrayYValues, minVal, tickDistance, j);
+                determineBucketCounts(nbOfBuckets, dataArray[j], dataArrayYValues, minVal, tickDistance, 1);
 
-                determineBucketCounts(nbOfBuckets, samplesFromDistr, distributionYValues, minVal, tickDistance, j);
+                determineBucketCounts(nbOfBuckets, samplesFromDistr[j], distributionYValues, minVal, tickDistance, 1);
             }
 
             frontLines.add("[");
@@ -198,15 +198,18 @@ public class LogsAndDistr {
         frontLines.add("var nbOfBuckets = \"" + nbOfBuckets + "\";");
     }
 
-    private static void determineBucketCounts(int nbOfBuckets, double[] samplesFromDistr, int[] distributionYValues, double minVal, double tickDistance, int j) {
-        int bucketForSampleDistr = (int) ((samplesFromDistr[j] - minVal) / tickDistance);
+    public static void determineBucketCounts(int nbOfBuckets, double sample,
+                                              int[] distributionYValues, double minVal,
+                                             double tickDistance, int count) {
 
-        if (bucketForSampleDistr < 0) {
-            distributionYValues[0]++;
-        } else if (bucketForSampleDistr > nbOfBuckets - 1) {
-            distributionYValues[nbOfBuckets - 1]++;
+        int bucketForSample = (int) ((sample - minVal) / tickDistance);
+
+        if (bucketForSample < 0) {
+            distributionYValues[0] += count;
+        } else if (bucketForSample > nbOfBuckets - 1) {
+            distributionYValues[nbOfBuckets - 1] += count;
         } else {
-            distributionYValues[bucketForSampleDistr]++;
+            distributionYValues[bucketForSample] += count;
         }
     }
 

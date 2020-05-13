@@ -35,6 +35,8 @@ import org.jmock.lib.concurrent.Synchroniser;
 import org.jmock.utils.LogsAndDistr;
 import org.junit.runners.model.FrameworkMethod;
 
+import static org.jmock.utils.LogsAndDistr.determineBucketCounts;
+
 
 /**
  * A Mockery represents the context, or neighbourhood, of the object(s) under test.
@@ -315,8 +317,8 @@ public class Mockery implements SelfDescribing {
         return TRT;
     }
 
-    public List<Double> getMultipleVirtualTimes() {
-        return dispatcher.getMultipleSingleContextIterations(true)
+    public List<Double> getMultipleVirtualTimes(boolean resetMultipleSingleContextIterations) {
+        return dispatcher.getMultipleSingleContextIterations(resetMultipleSingleContextIterations)
                 .stream()
                 .map(a -> a.totalVirtualTime)
                 .collect(Collectors.toList());
@@ -349,6 +351,8 @@ public class Mockery implements SelfDescribing {
 
     public void writeHtml(FrameworkMethod method) throws Exception {
         if(dispatcher.getRepeatCounter() == 1) {
+            //flush the virtual times
+            dispatcher.setSingleContextIteration(new InvocationDispatcher.SingleContextIteration());
             return;
         }
 
@@ -369,49 +373,99 @@ public class Mockery implements SelfDescribing {
         Files.write(filePath, frontLines);
 
         LogsAndDistr.writeBackSectionHTML(filePath, "/back.html", thisClass);
+
+        //flush the virtual times
+        dispatcher.setMultipleSingleContextIterations(new ArrayList<>());
     }
 
     private void writeMidSectionHTML(List<String> frontLines, Path filePath) throws IOException {
-//        Map<String, List<Double>> mvtpc = dispatcher.getMultipleVirtualTimesPerComponent();
-//        List<Map<String, String>> data = new ArrayList<>();
-//        int numOfBuckets = Math.min(50,dispatcher.getRepeatCounter());
-//        for(int i = 0; i < numOfBuckets; i++) {
-//            int finalI = i;
-//            data.add(new HashMap() {{put("name", "bucket" + finalI);}});
-//        }
-//        for (Map.Entry<String, List<Double>> comp : mvtpc.entrySet()) {
-//            //String compName = "\"met" + comp.getKey().length() + "\"";
-//            String compName = "\"" + comp.getKey() + "\"";
-//            List<Double> compSamples = comp.getValue();
-//            double coef = ((double) compSamples.size()) / dispatcher.getRepeatCounter();
-//            int bucketSize = compSamples.size() / numOfBuckets;
-//            for(int i = 0; i < numOfBuckets; i++) {
-//                int avgCompSample = 0;
-//                for (int j = (i * bucketSize); j < ((i + 1) * bucketSize); j++) {
-//                    avgCompSample += compSamples.get(j);
-//                }
-//                data.get(i).put(compName, "" + ((avgCompSample/bucketSize) * coef));
-//            }
-//        }
-//        List<String> columns = new ArrayList<>();
-//        frontLines.add("var data = " + "[");
-//        //frontLines.add("var data = " + data + ";");
-//        for (Map<String, String> percentileContent : data) {
-//            frontLines.add("{");
-//            for (Map.Entry<String, String> entry : percentileContent.entrySet()) {
-//                String key = entry.getKey();
-//                String val = entry.getValue();
-//                if (columns.size() < percentileContent.size() - 1) {
-//                    if (!key.equals("name")) {
-//                        columns.add(key);
-//                    }
-//                }
-//                frontLines.add(key + ":\"" + val + "\",");
-//            }
-//            frontLines.add("},");
-//        }
-//        frontLines.add("];");
-//        frontLines.add("var columns = " + columns + ";");
+        List<InvocationDispatcher.SingleContextIteration> MSCI =
+                dispatcher.getMultipleSingleContextIterations(false);
+
+        assert(MSCI.size() == dispatcher.getRepeatCounter());
+
+        MSCI.sort(Comparator.comparingDouble(t -> t.totalVirtualTime));
+
+        int nbOfBuckets = Math.min(50, dispatcher.getRepeatCounter());
+
+        int[] xTickValues = new int[nbOfBuckets];
+
+        int repeatCnt = MSCI.size();
+
+        Set<String> componentNames = new HashSet<>();
+
+        for(InvocationDispatcher.SingleContextIteration SCI : MSCI) {
+            componentNames.addAll(SCI.virtualTimesPerComponent.keySet());
+        }
+
+        Map<String, int[]> componentToDataArrayYValues = new HashMap<>();
+
+        for(String componentName : componentNames) {
+            componentToDataArrayYValues.put(componentName, new int[nbOfBuckets]);
+        }
+
+        double minVal = MSCI.get(0).totalVirtualTime;
+        double maxVal = MSCI.get(repeatCnt-1).totalVirtualTime;
+
+        if(maxVal - minVal < 50) {
+            maxVal += 50;
+            System.out.println("Adjusting tickvalues...");
+            //ensure that the distance between tickValues is >1.
+        }
+
+        xTickValues[0] = (int) minVal;
+        xTickValues[nbOfBuckets - 1] = (int) maxVal;
+
+        double tickDistance = (maxVal - minVal) * (1.0 / (nbOfBuckets - 1));
+
+        for (int j = 1; j < nbOfBuckets - 1; j++) {
+            xTickValues[j] = (int) (minVal + (maxVal - minVal) * ((double) j / (nbOfBuckets - 1)));
+        }
+
+        for(int i = 0; i < MSCI.size(); i++) {
+            Map<String, List<Double>> VTPC = MSCI.get(i).virtualTimesPerComponent;
+            for(String componentName : componentNames) {
+                determineBucketCounts(
+                        nbOfBuckets,
+                        MSCI.get(i).totalVirtualTime,
+                        componentToDataArrayYValues.get(componentName),
+                        minVal,
+                        tickDistance,
+                        VTPC.getOrDefault(componentName, new ArrayList<>()).size());
+            }
+        }
+
+        frontLines.add("var dataNested = [");
+
+        for(int i = 0; i < nbOfBuckets; i++) {
+            for(String componentName : componentNames) {
+                frontLines.add("{");
+                frontLines.add("\"name\":\"" + componentName +
+                        "\", \"tickVal\":\"" + xTickValues[i] +
+                        "\", \"value\":\"" + componentToDataArrayYValues.get(componentName)[i] + "\"");
+                frontLines.add("},");
+            }
+        }
+
+        frontLines.add("]");
+
+        frontLines.add("var xTickValues = [");
+
+        for(int i = 0; i < nbOfBuckets; i++) {
+            frontLines.add("\"" + xTickValues[i] + "\",");
+        }
+
+        frontLines.add("];");
+
+        frontLines.add("var nbOfBuckets = \"" + nbOfBuckets + "\";");
+
+        frontLines.add("var componentNames = [");
+
+        for(String componentName : componentNames) {
+            frontLines.add("\"" + componentName + "\",");
+        }
+
+        frontLines.add("];");
     }
 
 }

@@ -158,6 +158,11 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
     }
 
     @Override
+    public void setSingleContextIteration(SingleContextIteration singleContextIteration) {
+        this.singleContextIteration = singleContextIteration;
+    }
+
+    @Override
     public void setMultipleSingleContextIterations(List<SingleContextIteration> multipleSingleContextIterations) {
         this.multipleSingleContextIterations = multipleSingleContextIterations;
     }

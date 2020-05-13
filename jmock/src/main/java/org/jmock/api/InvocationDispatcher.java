@@ -33,6 +33,9 @@ public interface InvocationDispatcher extends SelfDescribing, ExpectationCollect
         return new SingleContextIteration();
     }
 
+    default void setSingleContextIteration(SingleContextIteration singleContextIteration) {
+    }
+
     default double getSingleRealTime() {
         return 0d;
     }
