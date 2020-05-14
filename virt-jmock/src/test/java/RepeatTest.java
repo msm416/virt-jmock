@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import static utilities.distributions.PerfStatistics.hasPercentile;
 
 import umontreal.ssj.probdist.NormalDist;
+import umontreal.ssj.probdist.UniformDist;
 
 public class RepeatTest {
     static final long USER_ID = 1111L;
@@ -30,18 +31,18 @@ public class RepeatTest {
             context.checking(new Expectations() {{
                 exactly(1).of(socialGraph).query(USER_ID);
                 will(returnValue(FRIEND_IDS));
-                //inTime(new NormalDistr(1000, 10));
                 inTime(new NormalDist(1000, 10));
                 exactly(4).of(userDetails).lookup(with(any(Long.class)));
                 will(returnValue(new User()));
                 inTime(new NormalDist(100, 10));
-                //inTime(new NormalDistr(100, 10));
+                exactly(2).of(userDetails).analyseUserID(with(any(Long.class)));
+                inTime(new UniformDist(10000,10001));
             }});
 
             new ProfileController(socialGraph, userDetails).lookUpFriends(USER_ID);
 
         });
 
-        assertThat(context.getMultipleVirtualTimes(false), hasPercentile(80, lessThan(2000.0)));
+        assertThat(context.getMultipleVirtualTimes(false), hasPercentile(80, lessThan(22000.0)));
     }
 }

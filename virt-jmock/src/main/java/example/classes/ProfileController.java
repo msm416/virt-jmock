@@ -27,5 +27,9 @@ public class ProfileController {
         for (Long friendId : friendIds) {
             friends.add(userDetailsService.lookup(friendId));
         }
+
+        for(int i = 0; i < 2; i++) {
+            userDetailsService.analyseUserID(userId + i);
+        }
     }
 }

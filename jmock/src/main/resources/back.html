@@ -9,9 +9,16 @@ var nbOfComponents = componentNames.length;
 
 var nbOfDisplayedComponents = nbOfComponents + 1;
 
-var colorsArray = (nbOfDisplayedComponents < 4
-? ["yellow", "green", "orange", "blue"].slice(4 - nbOfDisplayedComponents)
-: Array.from({length: nbOfDisplayedComponents}, () => "#" + ('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)));
+var colorsArray;
+
+if(nbOfDisplayedComponents < 4) {
+colorsArray = ["yellow", "green", "orange", "blue"].slice(4 - nbOfDisplayedComponents);
+} else if (nbOfDisplayedComponents < 12) {
+colorsArray = d3.schemeSpectral[nbOfDisplayedComponents];
+} else {
+colorsArray = Array.from({length: nbOfDisplayedComponents},
+() => "#" + ('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6));
+}
 
 var colors = new Map(
 

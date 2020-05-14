@@ -101,7 +101,7 @@
 
         if(desiredTotalTime > currentExecutionTime) {
             returnComputationMessage("color: blue",
-                "Computation has stopped: Desired Total Time is already smaller than " + currentExecutionTime);
+                "Computation has stopped: Desired Total Time is already larger than " + currentExecutionTime);
             return
         } else if (currentExecutionTimeConstantComponents === currentExecutionTime) {
             returnComputationMessage("color: red",
@@ -110,7 +110,8 @@
         } else if (currentExecutionTimeConstantComponents >= desiredTotalTime) {
             console.log(currentExecutionTimeConstantComponents);
             returnComputationMessage("color: red",
-                "Computation failed: Selected components are not sufficient to improve the total time. ");
+                "Computation failed: Selected components are not sufficient to improve the total time: "
+                +  currentExecutionTime);
             return
         }
 
