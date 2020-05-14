@@ -527,6 +527,7 @@ public class Mockery implements SelfDescribing {
             int maxBuckVal = 0;
 
             for(int i = 0; i < nbOfBuckets; i++) {
+                // non-zero component
                 int curBuckVal = (vals[0][i] != 0 ? vals[1][i] / vals[0][i] : maxBuckVal);
                 if(maxBuckVal < curBuckVal) {
                     maxBuckVal = curBuckVal;

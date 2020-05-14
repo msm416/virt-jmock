@@ -20,9 +20,9 @@
         <div class="col-sm">
             <div class="input-group">
                 <div class="input-group-append">
-                    <span class="input-group-text">Total Time <=</span>
+                    <span class="input-group-text">Desired Total Time <=</span>
                 </div>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" id="desiredTotalTime">
                 <div class="input-group-append">
                     <span class="input-group-text">ms</span>
                 </div>
@@ -33,7 +33,7 @@
                 <div class="input-group-append">
                     <span class="input-group-text">Confidence <=</span>
                 </div>
-                <input type="text" class="form-control" id="confidence">
+                <input type="text" class="form-control" id="confidence" value="75">
                 <div class="input-group-append">
                     <span class="input-group-text">%</span>
                 </div>
@@ -51,20 +51,82 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 <script>
-    function computeImprovement() {
+    function returnComputationMessage(outputColor, result) {
         var outputP = document.getElementById("outputP");
+        outputP.setAttribute("style", outputColor);
+        outputP.innerText = result;
+    }
+
+    function computeImprovement() {
         var confidence = parseInt(document.getElementById("confidence").value);
-        var result;
-        outputP.setAttribute("style", "color: red");
-        if(!confidence || 0 > confidence || 100 < confidence) {
-            result = "Computation failed: confidence is not an integer between 0 and 100.";
-            outputP.innerText = result;
+
+        if(!confidence || 0 >= confidence || 100 <= confidence) {
+            returnComputationMessage("color: red",
+                "Computation failed: confidence is not an integer strictly between 0 and 100.");
             return
         }
 
-        result = "Computation was successful!";
-        outputP.setAttribute("style", "color: green");
-        outputP.innerText = result;
+        var desiredTotalTime = parseFloat(document.getElementById("desiredTotalTime").value);
+
+        if(!desiredTotalTime) {
+            returnComputationMessage("color: red",
+                "Computation failed: Desired Total Time is not a float.");
+            return
+        }
+
+        var currentExecutionTime = 0.0;
+
+        var currentExecutionTimeConstantComponents = 0.0;
+
+        for(i = 0; i < nbOfComponents; i++) {
+            var compName = componentNames[i];
+            var stringImprFactor = document.getElementById(compName).value;
+            var improvementFactor = parseFloat(stringImprFactor);
+            if(isNaN(improvementFactor) && stringImprFactor !== "") {
+                returnComputationMessage("color: red",
+                    "Computation has stopped: Improvement Factor is not float for " + compName);
+                return
+            }
+
+            if(stringImprFactor === "") {
+                improvementFactor = 1.0;
+            } else {
+                currentExecutionTimeConstantComponents +=
+                    percentilesPerComponent[compName][parseInt(confidence / 100 * nbOfBuckets)] / improvementFactor;
+            }
+
+            currentExecutionTime +=
+                percentilesPerComponent[compName][parseInt(confidence / 100 * nbOfBuckets)] / improvementFactor;
+        }
+
+        if(desiredTotalTime > currentExecutionTime) {
+            returnComputationMessage("color: blue",
+                "Computation has stopped: Desired Total Time is already smaller than " + currentExecutionTime);
+            return
+        } else if (currentExecutionTimeConstantComponents === currentExecutionTime) {
+            returnComputationMessage("color: red",
+                "Computation failed: No component is available to be improved. ");
+            return
+        } else if (currentExecutionTimeConstantComponents >= desiredTotalTime) {
+            console.log(currentExecutionTimeConstantComponents);
+            returnComputationMessage("color: red",
+                "Computation failed: Selected components are not sufficient to improve the total time. ");
+            return
+        }
+
+        var improvement = (currentExecutionTime - currentExecutionTimeConstantComponents) /
+            (desiredTotalTime- currentExecutionTimeConstantComponents);
+
+        for(i = 0; i < nbOfComponents; i++) {
+            var compName = componentNames[i];
+            var factorDivToBeChanged = document.getElementById(compName);
+            if(isNaN(parseFloat(document.getElementById(compName).value))) {
+                factorDivToBeChanged.value = improvement;
+            }
+        }
+
+        returnComputationMessage("color: green",
+            "Computation has finished!");
     }
 </script>
 <script>
