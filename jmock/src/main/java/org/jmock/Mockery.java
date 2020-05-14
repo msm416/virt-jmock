@@ -406,6 +406,16 @@ public class Mockery implements SelfDescribing {
 
         componentToDataArrayYValues.put("Number of samples per bucket", new int[nbOfBuckets]);
 
+        Map<String, int[][]> componentToAvgIterationTimes = new HashMap<>();
+
+        for(String componentName : componentNames) {
+            componentToAvgIterationTimes.put(componentName, new int[2][nbOfBuckets]);
+            //first row contains the number of samples that fall in that bucket
+            //second row contains the average of those samples in the bucket
+            //the second row will be averaged after we first compute the first row
+        }
+
+
         double minVal = MSCI.get(0).totalVirtualTime;
         double maxVal = MSCI.get(repeatCnt-1).totalVirtualTime;
 
@@ -427,6 +437,7 @@ public class Mockery implements SelfDescribing {
         for(int i = 0; i < MSCI.size(); i++) {
             Map<String, List<Double>> VTPC = MSCI.get(i).virtualTimesPerComponent;
             for(String componentName : componentNames) {
+                //compute Y values on HTML
                 determineBucketCounts(
                         nbOfBuckets,
                         MSCI.get(i).totalVirtualTime,
@@ -434,6 +445,30 @@ public class Mockery implements SelfDescribing {
                         minVal,
                         tickDistance,
                         VTPC.getOrDefault(componentName, new ArrayList<>()).size());
+
+                //compute bucket count per component
+                //used determine denominator for the average bucket time per component
+                determineBucketCounts(
+                        nbOfBuckets,
+                        MSCI.get(i).totalVirtualTime,
+                        componentToAvgIterationTimes.get(componentName)[0],
+                        minVal,
+                        tickDistance,
+                        1);
+
+                //compute bucket sum per component
+                //used to determine the numerator for the average bucket time per component
+                determineBucketCounts(
+                        nbOfBuckets,
+                        MSCI.get(i).totalVirtualTime,
+                        componentToAvgIterationTimes.get(componentName)[1],
+                        minVal,
+                        tickDistance,
+                        (int) VTPC.getOrDefault(componentName, new ArrayList<>())
+                                .stream()
+                                .reduce(Double::sum)
+                                .orElse(0d)
+                                .doubleValue());
             }
 
             determineBucketCounts(
@@ -481,6 +516,28 @@ public class Mockery implements SelfDescribing {
         }
 
         frontLines.add("];");
+
+        frontLines.add("var percentilesPerComponent = {");
+
+        for(String componentName : componentNames) {
+            frontLines.add("\"" + componentName + "\":[");
+
+            int[][] vals = componentToAvgIterationTimes.get(componentName);
+
+            int maxBuckVal = 0;
+
+            for(int i = 0; i < nbOfBuckets; i++) {
+                int curBuckVal = (vals[0][i] != 0 ? vals[1][i] / vals[0][i] : maxBuckVal);
+                if(maxBuckVal < curBuckVal) {
+                    maxBuckVal = curBuckVal;
+                }
+                frontLines.add("\"" + curBuckVal + "\",");
+            }
+
+            frontLines.add("],");
+        }
+
+        frontLines.add("};");
     }
 
 }
