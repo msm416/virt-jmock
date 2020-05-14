@@ -2,15 +2,20 @@ var width = 2000, height = 500;
 
 var margin = ({top: 20, right: 30, bottom: 30, left: 30});
 
+var displayedComponents = componentNames.slice(0);
+displayedComponents.push("Number of samples per bucket");
+
 var nbOfComponents = componentNames.length;
 
-var colorsArray = (nbOfComponents < 3
-? ["red", "green", "blue"].slice(3 - nbOfComponents)
-: Array.from({length: nbOfComponents}, () => "#" + ('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)));
+var nbOfDisplayedComponents = nbOfComponents + 1;
+
+var colorsArray = (nbOfDisplayedComponents < 4
+? ["yellow", "green", "orange", "blue"].slice(4 - nbOfDisplayedComponents)
+: Array.from({length: nbOfDisplayedComponents}, () => "#" + ('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)));
 
 var colors = new Map(
 
-componentNames.map(function(e, i) {
+displayedComponents.map(function(e, i) {
 return [e, colorsArray[i]];
 })
 
@@ -19,6 +24,50 @@ return [e, colorsArray[i]];
 var color = d3.scaleOrdinal()
 .domain(Array.from(colors.keys()))
 .range(Array.from(colors.values()));
+
+var container = document.getElementById("container");
+
+for(i = 0; i < nbOfComponents; i++) {
+
+var row_i = document.createElement("div");
+var col_i = document.createElement("div");
+var input_group_i = document.createElement("div");
+var input_group_i_append = document.createElement("div");
+var span_input_group_i_append = document.createElement("span");
+var input_i = document.createElement("input");
+row_i.setAttribute("class", "row");
+row_i.setAttribute("id", "comp" + i);
+col_i.setAttribute("class", "col-sm");
+input_group_i.setAttribute("class", "input-group");
+input_group_i_append.setAttribute("class", "input-group-append");
+span_input_group_i_append.setAttribute("class", "input-group-text");
+span_input_group_i_append.setAttribute("style", "color: " + colors.get(componentNames[i]));
+span_input_group_i_append.innerText = componentNames[i];
+input_i.setAttribute("type", "text");
+input_i.setAttribute("class", "form-control");
+input_i.setAttribute("id", "" + componentNames[i]);
+
+container.appendChild(row_i);
+row_i.appendChild(col_i);
+col_i.appendChild(input_group_i);
+input_group_i.appendChild(input_group_i_append);
+input_group_i_append.appendChild(span_input_group_i_append);
+input_group_i.appendChild(input_i);
+}
+
+var outputP_row = document.createElement("div");
+outputP_row.setAttribute("class", "row");
+var outputP_par = document.createElement("p");
+outputP_par.setAttribute("id", "outputP");
+outputP_par.setAttribute("style", "color: black");
+outputP_par.innerText = "Computation result message is displayed here and if successful, improvement percentages are updated above.";
+
+outputP_row.appendChild(outputP_par);
+container.appendChild(outputP_row);
+
+// <div class="row">
+    //     <p id="outputP" style="color: black"> abcd </p>
+    //     </div>
 
 var data = dataNested;
 
@@ -86,7 +135,7 @@ svg.append("g")
 .attr("width", x.bandwidth() - 1)
 .attr("height", d => y(d[0]) - y(d[1]))
 .append("title")
-.text(d => `${d.data.name}: ${(d.data.value)} calls are within approx. ${formatTicks(d.data.tickVal)}`));
+.text(d => `${d.data.name}: ${(d.data.value)} ${(d.data.name) == "Number of samples per bucket" ? "": "invocations"} are within approx. ${formatTicks(d.data.tickVal)}`));
 
 svg.append("g")
 .call(xAxis);

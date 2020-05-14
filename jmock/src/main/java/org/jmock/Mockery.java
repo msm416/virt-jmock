@@ -404,6 +404,8 @@ public class Mockery implements SelfDescribing {
             componentToDataArrayYValues.put(componentName, new int[nbOfBuckets]);
         }
 
+        componentToDataArrayYValues.put("Number of samples per bucket", new int[nbOfBuckets]);
+
         double minVal = MSCI.get(0).totalVirtualTime;
         double maxVal = MSCI.get(repeatCnt-1).totalVirtualTime;
 
@@ -433,6 +435,14 @@ public class Mockery implements SelfDescribing {
                         tickDistance,
                         VTPC.getOrDefault(componentName, new ArrayList<>()).size());
             }
+
+            determineBucketCounts(
+                    nbOfBuckets,
+                    MSCI.get(i).totalVirtualTime,
+                    componentToDataArrayYValues.get("Number of samples per bucket"),
+                    minVal,
+                    tickDistance,
+                    1);
         }
 
         frontLines.add("var dataNested = [");
@@ -445,6 +455,11 @@ public class Mockery implements SelfDescribing {
                         "\", \"value\":\"" + componentToDataArrayYValues.get(componentName)[i] + "\"");
                 frontLines.add("},");
             }
+            frontLines.add("{");
+            frontLines.add("\"name\":\"" + "Number of samples per bucket" +
+                    "\", \"tickVal\":\"" + xTickValues[i] +
+                    "\", \"value\":\"" + componentToDataArrayYValues.get("Number of samples per bucket")[i] + "\"");
+            frontLines.add("},");
         }
 
         frontLines.add("]");
