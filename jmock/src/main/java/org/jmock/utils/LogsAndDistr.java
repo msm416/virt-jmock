@@ -38,10 +38,23 @@ public class LogsAndDistr {
 
 //        System.out.println(System.currentTimeMillis() - start);
 
+//        try {
+//            getBestDistributionFromEmpiricalData(
+//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                            "lookupOnApiIngredientDetails"), "dist1");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
         try {
-            getBestDistributionFromEmpiricalData(
+            Distribution oldDistr = getBestDistributionFromEmpiricalData(
+                        getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+                                "lookupOnApiIngredientDetails"), "dist1");
+            Distribution newDistr = getBestDistributionFromEmpiricalData(
                     getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
-                            "lookupOnApiIngredientDetails"), "dist1");
+                            "lookupTopMealByComplexity"), "dist1");
+
+            System.out.println("Adjustment factor: " + getAdjustmentFactor(oldDistr, newDistr));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -341,5 +354,25 @@ public class LogsAndDistr {
         BufferedReader brFront = new BufferedReader(new InputStreamReader(thisClass.getResourceAsStream(sectionPath)));
         frontLines.addAll(brFront.lines().collect(Collectors.toList()));
         return filePath;
+    }
+
+    public static double getAdjustmentFactor(Distribution oldDistr, Distribution newDist) {
+        List<Double> oldSamples = new ArrayList<>();
+        List<Double> newSamples = new ArrayList<>();
+
+        for(int i = 0; i < 1000; i++) {
+            oldSamples.add(Math.max(oldDistr.inverseF(Math.random()), 0));
+            newSamples.add(Math.max(newDist.inverseF(Math.random()),0));
+        }
+
+        Collections.sort(oldSamples);
+        Collections.sort(newSamples);
+
+        if(newSamples.get(800) == 0) {
+            return 999999;
+        }
+
+        // return 80th percentile
+        return oldSamples.get(800) / newSamples.get(800);
     }
 }
