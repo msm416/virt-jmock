@@ -123,7 +123,8 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
                     if(invocationExpectation.getPerformanceModel() != null) {
                         //double sample = invocationExpectation.getPerformanceModel().sample();
                         double sample = Math.max(0d,
-                                invocationExpectation.getPerformanceModel().inverseF(Math.random()));
+                                invocationExpectation.getPerformanceModel().inverseF(Math.random()) /
+                                invocationExpectation.getAdjustmentFactor());
 
                         String methodName = invocation.getInvokedMethod().toString();
 

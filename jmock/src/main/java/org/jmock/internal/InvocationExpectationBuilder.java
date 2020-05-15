@@ -60,7 +60,12 @@ public class InvocationExpectationBuilder
     public void setModel(Distribution distribution) {
         expectation.setPerformanceModel(distribution);
     }
-    
+
+    public void setAdjustmentFactor(double adjustmentFactor) {
+        expectation.setAdjustmentFactor(adjustmentFactor);
+    }
+
+
     public void addSideEffect(SideEffect sideEffect) {
         expectation.addSideEffect(sideEffect);
     }

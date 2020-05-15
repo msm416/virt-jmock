@@ -237,6 +237,11 @@ public abstract class AbstractExpectations implements ExpectationBuilder,
     public void inTime(Distribution model) {
         currentBuilder().setModel(model);
     }
+
+    public void inTime(Distribution model, double adjustmentFactor) {
+        currentBuilder().setModel(model);
+        currentBuilder().setAdjustmentFactor(adjustmentFactor);
+    }
     
     /* Common constraints
      */

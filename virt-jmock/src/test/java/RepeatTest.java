@@ -36,13 +36,13 @@ public class RepeatTest {
                 will(returnValue(new User()));
                 inTime(new NormalDist(100, 10));
                 exactly(2).of(userDetails).analyseUserID(with(any(Long.class)));
-                inTime(new UniformDist(10000,10001));
+                inTime(new UniformDist(10000,10001), 2);
             }});
 
             new ProfileController(socialGraph, userDetails).lookUpFriends(USER_ID);
 
         });
 
-        assertThat(context.getMultipleVirtualTimes(false), hasPercentile(80, lessThan(22000.0)));
+        assertThat(context.getMultipleVirtualTimes(false), hasPercentile(80, lessThan(12000.0)));
     }
 }
