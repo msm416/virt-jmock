@@ -41,14 +41,14 @@ public class LogsAndDistr {
         try {
             getBestDistributionFromEmpiricalData(
                     getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
-                            "lookupOnApiIngredientDetails"));
+                            "lookupOnApiIngredientDetails"), "dist1");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private static void writeDistributionSummaryHTML(List<ContinuousDistribution> distributionList,
-                                                     double[] dataArray, double[][] pval) {
+                                                     double[] dataArray, double[][] pval, String nameToAppend) {
         List<String> frontLines = new ArrayList<>();
 
         Class mockeryClass = Mockery.class;
@@ -56,7 +56,7 @@ public class LogsAndDistr {
         try {
             Path filePath = LogsAndDistr.writeFrontSectionHTML(
                     frontLines,
-                    "DistributionComparison.html",
+                    "DistributionComparison-" + nameToAppend + ".html",
                     "/frontDistr.html",
                     mockeryClass);
 
@@ -256,14 +256,14 @@ public class LogsAndDistr {
         return samples;
     }
 
-    public static Distribution getBestDistributionFromEmpiricalData(ArrayList<Double> data) throws Exception {
+    public static Distribution getBestDistributionFromEmpiricalData(ArrayList<Double> data, String nameToAppend) throws Exception {
         Class[] distClasses = {NormalDist.class, LaplaceDist.class, UniformDist.class};
-        return getBestDistributionFromEmpiricalData(data, distClasses);
+        return getBestDistributionFromEmpiricalData(data, nameToAppend, distClasses);
     }
 
     // This method is based on Kolmogorov Smirnov test, but any other could work
     // TODO: make this method support non-cont distr.
-    public static Distribution getBestDistributionFromEmpiricalData(ArrayList<Double> data,
+    public static Distribution getBestDistributionFromEmpiricalData(ArrayList<Double> data, String nameToAppend,
                                                                     Class[] distributionClasses)
             throws Exception {
 
@@ -273,7 +273,7 @@ public class LogsAndDistr {
 
         List<ContinuousDistribution> distributionList = getBestInstancesFromDistList(distributionClasses, dataArray);
 
-        return getBestDistributionViaGoodnessToFitTest(dataArray, distributionList, false);
+        return getBestDistributionViaGoodnessToFitTest(dataArray, distributionList, false, nameToAppend);
     }
 
     private static List<ContinuousDistribution> getBestInstancesFromDistList(Class[] distributionClasses, double[] dataArray) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -293,7 +293,7 @@ public class LogsAndDistr {
 
     public static Distribution getBestDistributionViaGoodnessToFitTest(double[] dataArray,
                                                                        List<ContinuousDistribution> distributionList,
-                                                                       boolean isFindingBestMixtureDistr) {
+                                                                       boolean isFindingBestMixtureDistr, String nameToAppend) {
         int distributionListLen = distributionList.size();
         double[][] sval = new double[distributionList.size()][3];
         double[][] pval = new double[distributionList.size()][3];
@@ -311,7 +311,7 @@ public class LogsAndDistr {
 
         if (!isFindingBestMixtureDistr) {
             System.out.println("Best distribution is: " + distributionList.get(maxPvalIndex));
-            writeDistributionSummaryHTML(distributionList, dataArray,  pval);
+            writeDistributionSummaryHTML(distributionList, dataArray,  pval, nameToAppend);
         }
 
         return distributionList.get(maxPvalIndex);
