@@ -49,10 +49,10 @@ public class LogsAndDistr {
         try {
             Distribution oldDistr = getBestDistributionFromEmpiricalData(
                         getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
-                                "lookupOnApiIngredientDetails"), "dist1");
+                                "lookupIngredientNutritionCombined"), "dist1");
             Distribution newDistr = getBestDistributionFromEmpiricalData(
                     getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
-                            "lookupTopMealByComplexity"), "dist1");
+                            "lookupIngredientNutritionCombinedParallel"), "dist2");
 
             System.out.println("Adjustment factor: " + getAdjustmentFactor(oldDistr, newDistr));
         } catch (Exception e) {
@@ -88,9 +88,7 @@ public class LogsAndDistr {
         //TODO: make buckets
         int n = dataArray.length;
 
-        assert (n >= 50);
-        //dataArray = Arrays.copyOfRange(dataArray, 0, 50);
-        int nbOfBuckets = 50;
+        int nbOfBuckets = Math.min(50, n);
 
         double[] totalOver = new double[n];
         double[] totalUnder = new double[n];
