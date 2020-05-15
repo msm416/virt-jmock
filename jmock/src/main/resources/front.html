@@ -16,11 +16,19 @@
 <svg width="2000" height="500"></svg>
 
 <div class="container" id="container" style="border-style: groove;">
+    <br>
+    <div class="row justify-content-center" >
+        <div class="col-md-offset-3">
+            <button type="button" class="btn btn-outline-secondary" onclick="computeImprovement();">Compute Improvement</button>
+
+        </div>
+    </div>
+    <br>
     <div class="row">
         <div class="col-sm">
             <div class="input-group">
                 <div class="input-group-append">
-                    <span class="input-group-text">Desired Total Time <=</span>
+                    <span class="input-group-text">Desired Time <=</span>
                 </div>
                 <input type="text" class="form-control" id="desiredTotalTime">
                 <div class="input-group-append">
@@ -31,16 +39,23 @@
         <div class="col-sm">
             <div class="input-group">
                 <div class="input-group-append">
-                    <span class="input-group-text">Confidence <=</span>
+                    <span class="input-group-text">Percentile </span>
                 </div>
                 <input type="text" class="form-control" id="confidence" value="75">
                 <div class="input-group-append">
-                    <span class="input-group-text">%</span>
+                    <span class="input-group-text">th</span>
                 </div>
             </div>
         </div>
         <div class="col-sm">
-            <button type="button" class="btn btn-outline-primary" onclick="computeImprovement();">Compute Improvement</button>
+            <div class="input-group">
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <input id="mode" type="checkbox" aria-label="Checkbox for following text input">
+                    </div>
+                </div>
+                <span class="input-group-text"> Aggressive Mode </span>
+            </div>
         </div>
     </div>
 </div>
@@ -58,6 +73,8 @@
     }
 
     function computeImprovement() {
+        var mode = document.getElementById("mode").checked ? "aggressiveMode" : "normalMode";
+
         var confidence = parseInt(document.getElementById("confidence").value);
 
         if(!confidence || 0 >= confidence || 100 <= confidence) {
@@ -92,11 +109,11 @@
                 improvementFactor = 1.0;
             } else {
                 currentExecutionTimeConstantComponents +=
-                    percentilesPerComponent[compName][parseInt(confidence)] / improvementFactor;
+                    percentilesPerComponent[compName][mode][parseInt(confidence)] / improvementFactor;
             }
 
             currentExecutionTime +=
-                percentilesPerComponent[compName][parseInt(confidence)] / improvementFactor;
+                percentilesPerComponent[compName][mode][parseInt(confidence)] / improvementFactor;
         }
 
         if(desiredTotalTime > currentExecutionTime) {

@@ -542,8 +542,9 @@ public class Mockery implements SelfDescribing {
 
         frontLines.add("var percentilesPerComponent = {");
         for(String componentName : componentNames) {
-            frontLines.add("\"" + componentName + "\":[");
+            frontLines.add("\"" + componentName + "\": {");
             double maxPerc = 0d;
+            frontLines.add("\"aggressiveMode\": [");
             for(int i = 0; i < 100; i++) {
                 double currPerc = MSCI.get((int) (MSCI.size() * (i / 100.0)))
                         .virtualTimesPerComponent
@@ -556,8 +557,22 @@ public class Mockery implements SelfDescribing {
                 }
                 frontLines.add("\"" + maxPerc + "\",");
             }
-
             frontLines.add("],");
+
+            frontLines.add("\"normalMode\": [");
+            for(int i = 0; i < 100; i++) {
+                double currPerc = MSCI.get((int) (MSCI.size() * (i / 100.0)))
+                        .virtualTimesPerComponent
+                        .get(componentName)
+                        .stream()
+                        .reduce(Double::sum)
+                        .orElse(0d);
+
+                frontLines.add("\"" + currPerc + "\",");
+            }
+            frontLines.add("],");
+
+            frontLines.add("},");
         }
         frontLines.add("};");
     }
