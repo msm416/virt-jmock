@@ -517,27 +517,48 @@ public class Mockery implements SelfDescribing {
 
         frontLines.add("];");
 
-        frontLines.add("var percentilesPerComponent = {");
+//        frontLines.add("var percentilesPerComponent = {");
+//
+//        for(String componentName : componentNames) {
+//            frontLines.add("\"" + componentName + "\":[");
+//
+//            int[][] vals = componentToAvgIterationTimes.get(componentName);
+//
+//            int maxBuckVal = 0;
+//
+//            for(int i = 0; i < nbOfBuckets; i++) {
+//                // non-zero component
+//                int curBuckVal = (vals[0][i] != 0 ? vals[1][i] / vals[0][i] : maxBuckVal);
+//                if(maxBuckVal < curBuckVal) {
+//                    maxBuckVal = curBuckVal;
+//                }
+//                frontLines.add("\"" + curBuckVal + "\",");
+//            }
+//
+//            frontLines.add("],");
+//        }
+//
+//        frontLines.add("};");
 
+        frontLines.add("var percentilesPerComponent = {");
         for(String componentName : componentNames) {
             frontLines.add("\"" + componentName + "\":[");
-
-            int[][] vals = componentToAvgIterationTimes.get(componentName);
-
-            int maxBuckVal = 0;
-
-            for(int i = 0; i < nbOfBuckets; i++) {
-                // non-zero component
-                int curBuckVal = (vals[0][i] != 0 ? vals[1][i] / vals[0][i] : maxBuckVal);
-                if(maxBuckVal < curBuckVal) {
-                    maxBuckVal = curBuckVal;
+            double maxPerc = 0d;
+            for(int i = 0; i < 100; i++) {
+                double currPerc = MSCI.get((int) (MSCI.size() * (i / 100.0)))
+                        .virtualTimesPerComponent
+                        .get(componentName)
+                        .stream()
+                        .reduce(Double::sum)
+                        .orElse(0d);
+                if(maxPerc < currPerc) {
+                    maxPerc = currPerc;
                 }
-                frontLines.add("\"" + curBuckVal + "\",");
+                frontLines.add("\"" + maxPerc + "\",");
             }
 
             frontLines.add("],");
         }
-
         frontLines.add("};");
     }
 

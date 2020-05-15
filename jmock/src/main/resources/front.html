@@ -92,11 +92,11 @@
                 improvementFactor = 1.0;
             } else {
                 currentExecutionTimeConstantComponents +=
-                    percentilesPerComponent[compName][parseInt(confidence / 100 * nbOfBuckets)] / improvementFactor;
+                    percentilesPerComponent[compName][parseInt(confidence)] / improvementFactor;
             }
 
             currentExecutionTime +=
-                percentilesPerComponent[compName][parseInt(confidence / 100 * nbOfBuckets)] / improvementFactor;
+                percentilesPerComponent[compName][parseInt(confidence)] / improvementFactor;
         }
 
         if(desiredTotalTime > currentExecutionTime) {
