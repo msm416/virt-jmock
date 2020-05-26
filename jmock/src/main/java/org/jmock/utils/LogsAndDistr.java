@@ -46,16 +46,22 @@ public class LogsAndDistr {
 //            e.printStackTrace();
 //        }
 
-        try {
-            Distribution oldDistr = getBestDistributionFromEmpiricalData(
-                        getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
-                                "lookupIngredientNutritionCombined"), "dist1");
-            Distribution newDistr = getBestDistributionFromEmpiricalData(
-                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
-                            "lookupIngredientNutritionCombinedParallel"), "dist2");
+//        try {
+//            Distribution oldDistr = getBestDistributionFromEmpiricalData(
+//                        getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                                "lookupIngredientNutritionCombined"), "dist1");
+//            Distribution newDistr = getBestDistributionFromEmpiricalData(
+//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                            "lookupIngredientNutritionCombinedParallel"), "dist2");
+//
+//            System.out.println("Adjustment factor: " + getAdjustmentFactor(oldDistr, newDistr));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
-            System.out.println("Adjustment factor: " + getAdjustmentFactor(oldDistr, newDistr));
-        } catch (Exception e) {
+        try {
+            runForSomeTimeAndGenerateLogsOnHeroku();
+        } catch (InterruptedException | UnirestException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
@@ -354,7 +360,7 @@ public class LogsAndDistr {
         return filePath;
     }
 
-    public static double getAdjustmentFactor(Distribution oldDistr, Distribution newDist) {
+    public static double computeAdjustmentFactor(Distribution oldDistr, Distribution newDist) {
         List<Double> oldSamples = new ArrayList<>();
         List<Double> newSamples = new ArrayList<>();
 

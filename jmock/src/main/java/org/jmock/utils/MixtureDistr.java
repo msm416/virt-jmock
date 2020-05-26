@@ -84,22 +84,26 @@ public class MixtureDistr extends ContinuousDistribution {
 
     }
 
-    //TODO BUT NOT USED:
+    //TODO: BUT NOT USED BY ANY METHOD
     @Override
     public double density(double v) {
-        return 0;
+        double density = 0d;
+        for (int i = 0; i < distributions.length; i++) {
+            density += distributions[i].density(v) * weights[i];
+        }
+        return density;
     }
 
     @Override
     public double cdf(double v) {
-        double cdf = 0.0;
+        double cdf = 0d;
         for (int i = 0; i < distributions.length; i++) {
             cdf += distributions[i].cdf(v) * weights[i];
         }
         return cdf;
     }
 
-    //TODO BUT NOT USED:
+    //TODO: BUT NOT USED BY ANY METHOD
     @Override
     public double[] getParams() {
         return new double[0];
