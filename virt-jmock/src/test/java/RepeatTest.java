@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertThat;
-import static utilities.distributions.PerfStatistics.hasPercentile;
+import static org.jmock.utils.PerfStatistics.hasPercentile;
 
 import umontreal.ssj.probdist.NormalDist;
 import umontreal.ssj.probdist.UniformDist;
