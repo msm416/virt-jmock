@@ -37,6 +37,7 @@ public class RepeatTest {
                 inTime(new NormalDist(100, 10));
                 exactly(2).of(userDetails).analyseUserID(with(any(Long.class)));
                 inTime(new UniformDist(10000,10001), 4.365964556328926);
+                //remainingTime(new SequentialCallsDist());
             }});
 
             new ProfileController(socialGraph, userDetails).lookUpFriends(USER_ID);
@@ -44,13 +45,5 @@ public class RepeatTest {
         });
 
         assertThat(context.getMultipleVirtualTimes(false), hasPercentile(75, lessThan(6000d)));
-
-//        Q + L + A = 21000 < 6000; // improve A
-//        A = 21000 - Q - L = 21000 - 1000 - 400 = 19600;
-//        D_A = 6000 - 1000 -400 = 4600;
-//        FACT = 19600 / 4600 = 4.6;
-
-
-
     }
 }

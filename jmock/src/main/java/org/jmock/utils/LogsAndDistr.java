@@ -26,6 +26,46 @@ import java.util.stream.Collectors;
 public class LogsAndDistr {
     public static void main(String[] args) {
 //        try {
+//            getBestDistributionFromEmpiricalData(
+//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                            "lookupMealIngredients", 0d),
+//                    "lookupMealIngredientsDist");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        Distribution lookupIngredientNutritionDistr = getDiscreteDistribution(
+                getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+                        "lookupIngredientNutrition",
+                        0.2));
+
+        double adjFactor = computeAdjustmentFactor(
+
+
+                new SequentialCallsDist(new UniformIntDist(1, 5), lookupIngredientNutritionDistr),
+
+                    getDiscreteDistribution(
+                        getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+                                "lookupIngredientNutritionCombinedParallel",
+                                0.2)));
+//
+        System.out.println(adjFactor);
+
+//        double adjFactor = computeAdjustmentFactor(
+//
+//
+//                getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                        "lookupIngredientNutritionCombinedSequential",
+//                        0.2),
+//                //new SequentialCallsDist(new UniformIntDist(1, 5), lookupIngredientNutritionDistr),
+//
+//
+//                getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                        "lookupIngredientNutritionCombinedParallel",
+//                        0.2),
+//                0.8);
+
+//        try {
 //            runForSomeTimeAndGenerateLogsOnHeroku();
 //        } catch (Exception e) {
 //            e.printStackTrace();
@@ -59,11 +99,21 @@ public class LogsAndDistr {
 //            e.printStackTrace();
 //        }
 
-        try {
-            runForSomeTimeAndGenerateLogsOnHeroku();
-        } catch (InterruptedException | UnirestException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            runForSomeTimeAndGenerateLogsOnHeroku();
+//        } catch (InterruptedException | UnirestException | UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+
+//        try {
+//            getBestDistributionFromEmpiricalData(
+//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                            "lookupMealIngredients", 0.3), "lookupMealIngredientsDist");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        //getDiscreteDistribution(new double[]{2, 3, 3, 4 , 4, 5});
     }
 
     private static void writeDistributionSummaryHTML(List<ContinuousDistribution> distributionList,
@@ -91,7 +141,6 @@ public class LogsAndDistr {
 
     private static void writeMidSection(List<String> frontLines, List<ContinuousDistribution> distributionList,
                                         double[] dataArray, double[][] pval) {
-        //TODO: make buckets
         int n = dataArray.length;
 
         int nbOfBuckets = Math.min(50, n);
@@ -251,7 +300,9 @@ public class LogsAndDistr {
         }
     }
 
-    public static ArrayList<Double> getSamplesFromLog(String logfile, String methodName) {
+    public static double[] getSamplesFromLog(String logfile, String methodName, double excludedPercentiles) {
+        assert (excludedPercentiles >= 0d && excludedPercentiles <= 1d);
+
         ArrayList<Double> samples = new ArrayList<>();
         String logfileContent = null;
         try {
@@ -270,27 +321,34 @@ public class LogsAndDistr {
                 samples.add(Double.parseDouble(part));
             }
         }
-        return samples;
+
+        double[] samplesArray = samples.stream().mapToDouble(Double::doubleValue).toArray();
+
+        int length = samplesArray.length;
+
+        samplesArray = Arrays.copyOfRange(samplesArray,
+                (int) (length * excludedPercentiles) ,
+                (int) (length * (1d - excludedPercentiles)));
+
+        Arrays.sort(samplesArray);
+
+        return samplesArray;
     }
 
-    public static Distribution getBestDistributionFromEmpiricalData(ArrayList<Double> data, String nameToAppend) throws Exception {
+    public static Distribution getBestDistributionFromEmpiricalData(double[] data, String nameToAppend) throws Exception {
         Class[] distClasses = {NormalDist.class, LaplaceDist.class, UniformDist.class};
         return getBestDistributionFromEmpiricalData(data, nameToAppend, distClasses);
     }
 
     // This method is based on Kolmogorov Smirnov test, but any other could work
-    // TODO: make this method support non-cont distr.
-    public static Distribution getBestDistributionFromEmpiricalData(ArrayList<Double> data, String nameToAppend,
+    // TODO FUTURE WORK: extend this method to support discrete distr.
+    public static Distribution getBestDistributionFromEmpiricalData(double[] data, String nameToAppend,
                                                                     Class[] distributionClasses)
             throws Exception {
 
-        double[] dataArray = data.stream().mapToDouble(Double::doubleValue).toArray();
+        List<ContinuousDistribution> distributionList = getBestInstancesFromDistList(distributionClasses, data);
 
-        Arrays.sort(dataArray);
-
-        List<ContinuousDistribution> distributionList = getBestInstancesFromDistList(distributionClasses, dataArray);
-
-        return getBestDistributionViaGoodnessToFitTest(dataArray, distributionList, false, nameToAppend);
+        return getBestDistributionViaGoodnessToFitTest(data, distributionList, false, nameToAppend);
     }
 
     private static List<ContinuousDistribution> getBestInstancesFromDistList(Class[] distributionClasses, double[] dataArray) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -365,7 +423,11 @@ public class LogsAndDistr {
         List<Double> newSamples = new ArrayList<>();
 
         for(int i = 0; i < 1000; i++) {
-            oldSamples.add(Math.max(oldDistr.inverseF(Math.random()), 0));
+            if(oldDistr instanceof SequentialCallsDist) {
+                oldSamples.add(Math.max(((SequentialCallsDist) oldDistr).getSample(), 0));
+            } else {
+                oldSamples.add(Math.max(oldDistr.inverseF(Math.random()), 0));
+            }
             newSamples.add(Math.max(newDist.inverseF(Math.random()),0));
         }
 
@@ -378,5 +440,48 @@ public class LogsAndDistr {
 
         // return 80th percentile
         return oldSamples.get(800) / newSamples.get(800);
+    }
+
+    public static double computeAdjustmentFactor(double[] oldDistrSamples,
+                                                 double[]  newDistrSamples,
+                                                 double percentile) {
+
+        assert (0d <= percentile && percentile <= 1d);
+
+        double oldSampleAtPerc = oldDistrSamples[(int)((oldDistrSamples.length-1) * percentile)];
+        double newSampleAtPerc = newDistrSamples[(int)((newDistrSamples.length-1) * percentile)];
+
+        if(oldSampleAtPerc == 0) {
+            return 999999;
+        }
+        return oldSampleAtPerc / newSampleAtPerc;
+    }
+
+    public static Distribution getDiscreteDistribution(double[] samples) {
+        //PRE: samples are ordered and positive
+        //POST: return a discrete distribution from samples
+
+        int n = samples.length;
+
+        int index = -1;
+
+        double prevVal = -1;
+
+        double[] prob = new double[n];
+
+        double[] newSamples = new double[n];
+
+        for(int i = 0; i < n; i++) {
+            if(prevVal != samples[i]) {
+                index++;
+                newSamples[index] = samples[i];
+            }
+
+            prob[index] += 1d/n;
+
+            prevVal = samples[i];
+        }
+
+        return new DiscreteDistribution(newSamples, prob, index + 1);
     }
 }

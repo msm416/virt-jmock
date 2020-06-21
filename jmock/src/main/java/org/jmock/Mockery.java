@@ -356,7 +356,6 @@ public class Mockery implements SelfDescribing {
             return;
         }
 
-        //TODO: back.html +2 in var color.
         List<String> frontLines = new ArrayList<>();
 
         Class thisClass = Mockery.class;

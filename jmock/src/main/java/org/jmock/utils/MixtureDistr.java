@@ -84,7 +84,6 @@ public class MixtureDistr extends ContinuousDistribution {
 
     }
 
-    //TODO: BUT NOT USED BY ANY METHOD
     @Override
     public double density(double v) {
         double density = 0d;
@@ -103,7 +102,7 @@ public class MixtureDistr extends ContinuousDistribution {
         return cdf;
     }
 
-    //TODO: BUT NOT USED BY ANY METHOD
+    //TODO WARNING: MIGHT WANT TO IMPLEMENT, BUT NOT USED BY ANY METHOD CURRENTLY
     @Override
     public double[] getParams() {
         return new double[0];
