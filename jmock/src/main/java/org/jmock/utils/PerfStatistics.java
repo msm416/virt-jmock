@@ -1,4 +1,4 @@
-package utilities.distributions;
+package org.jmock.utils;
 
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.stat.descriptive.rank.Percentile;

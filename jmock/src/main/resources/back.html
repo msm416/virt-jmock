@@ -1,56 +1,160 @@
-var width = 960, height = 500;
+var width = 2000, height = 500;
 
-var margin = ({top: 10, right: 10, bottom: 20, left: 40});
+var margin = ({top: 20, right: 30, bottom: 30, left: 30});
+
+var displayedComponents = componentNames.slice(0);
+displayedComponents.push("Number of samples per bucket");
+
+var nbOfComponents = componentNames.length;
+
+var nbOfDisplayedComponents = nbOfComponents + 1;
+
+var colorsArray;
+
+if(nbOfDisplayedComponents < 4) {
+colorsArray = ["yellow", "green", "orange", "blue"].slice(4 - nbOfDisplayedComponents);
+} else if (nbOfDisplayedComponents < 12) {
+colorsArray = d3.schemeSpectral[nbOfDisplayedComponents];
+} else {
+colorsArray = Array.from({length: nbOfDisplayedComponents},
+() => "#" + ('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6));
+}
+
+var colors = new Map(
+
+displayedComponents.map(function(e, i) {
+return [e, colorsArray[i]];
+})
+
+);
+
+var color = d3.scaleOrdinal()
+.domain(Array.from(colors.keys()))
+.range(Array.from(colors.values()));
+
+var container = document.getElementById("container");
+
+for(i = 0; i < nbOfComponents; i++) {
+// <div class="input-group-append">
+    //         <span class="input-group-text">%</span>
+    //         </div>
+var row_i = document.createElement("div");
+var col_i = document.createElement("div");
+var input_group_i = document.createElement("div");
+var input_group_i_append = document.createElement("div");
+var span_input_group_i_append = document.createElement("span");
+var input_i = document.createElement("input");
+var description_input_group_i_append = document.createElement("div");
+var span_description_input_group_i_append = document.createElement("span");
+
+row_i.setAttribute("class", "row");
+row_i.setAttribute("id", "comp" + i);
+col_i.setAttribute("class", "col-sm");
+input_group_i.setAttribute("class", "input-group");
+input_group_i_append.setAttribute("class", "input-group-append");
+span_input_group_i_append.setAttribute("class", "input-group-text");
+span_input_group_i_append.setAttribute("style", "color: " + colors.get(componentNames[i]));
+span_input_group_i_append.innerText = componentNames[i];
+input_i.setAttribute("type", "text");
+input_i.setAttribute("class", "form-control");
+input_i.setAttribute("id", "" + componentNames[i]);
+
+description_input_group_i_append.setAttribute("class", "input-group-append");
+span_description_input_group_i_append.setAttribute("class", "input-group-text");
+span_description_input_group_i_append.innerText = "Adjustment Factor";
+
+
+container.appendChild(row_i);
+row_i.appendChild(col_i);
+col_i.appendChild(input_group_i);
+input_group_i.appendChild(input_group_i_append);
+input_group_i_append.appendChild(span_input_group_i_append);
+input_group_i.appendChild(input_i);
+
+description_input_group_i_append.appendChild(span_description_input_group_i_append);
+input_group_i.appendChild(description_input_group_i_append);
+}
+
+var outputP_row = document.createElement("div");
+outputP_row.setAttribute("class", "row");
+var outputP_par = document.createElement("p");
+outputP_par.setAttribute("id", "outputP");
+outputP_par.setAttribute("style", "color: black; padding-left: 15px;");
+outputP_par.innerText = "Computation result message is displayed here and if successful, improvement percentages are updated above.";
+
+outputP_row.appendChild(outputP_par);
+container.appendChild(outputP_row);
+
+// <div class="row">
+    //     <p id="outputP" style="color: black"> abcd </p>
+    //     </div>
+var data = dataNested;
+
+formatTicks = x => (x == xTickValues[0])
+? ("<=" + x)
+: ((x == xTickValues[nbOfBuckets - 1])
+? (">=" + x)
+: `${x + ""}`);
+
+formatTicksInArr = x => x.map(function(val, index){
+return val+1;
+})
 
 formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
 
-var series = d3.stack()
-.keys(columns)
-(data)
-.map(d => (d.forEach(v => v.key = d.key), d));
-
-var color = d3.scaleOrdinal()
-.domain(series.map(d => d.key))
-.range(d3.schemeBrBG[series.length+2])
-.unknown("#ccc");
+series = d3.stack()
+.keys(Array.from(colors.keys()))
+.value((group, key) => group.get(key).value)
+.order(d3.stackOrderReverse)
+(Array.from(d3.rollup(data, ([d]) => d, d => d.tickVal, d => d.name).values()))
+.map(s => (s.forEach(d => d.data = d.data.get(s.key)), s));
 
 x = d3.scaleBand()
-.domain(data.map(d => d.name))
-.range([margin.left, width - margin.right])
-.padding(0.1);
+.domain(data.map(d => d.tickVal))
+.rangeRound([margin.left, width - margin.right]);
 
 y = d3.scaleLinear()
-.domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
-.rangeRound([height - margin.bottom, margin.top]);
+.domain([0, d3.max(series, d => d3.max(d, d => d[1]))]).nice()
+.range([height - margin.bottom, margin.top]);
 
 xAxis = g => g
 .attr("transform", `translate(0,${height - margin.bottom})`)
-.call(d3.axisBottom(x).tickSizeOuter(0))
-.call(g => g.selectAll(".domain").remove());
+.call(d3.axisBottom(x)
+.tickValues(xTickValues)
+.tickFormat(formatTicks)
+.tickSizeOuter(0));
 
 yAxis = g => g
 .attr("transform", `translate(${margin.left},0)`)
-.call(d3.axisLeft(y).ticks(null, "s"))
-.call(g => g.selectAll(".domain").remove());
+.call(d3.axisLeft(y)
+.tickFormat(x => (x).toFixed(0)))
+.call(g => g.select(".domain").remove())
+.call(g => g.select(".tick:last-of-type text").clone()
+.attr("x", 3)
+.attr("text-anchor", "start")
+.attr("font-weight", "bold")
+.text(data.y));
 
-const svg = d3.select("svg")
-.attr("viewBox", [0, 0, width, height]);
+formatRevenue = x => (+(x / 1e9).toFixed(2) >= 1)
+? `${(x / 1e9).toFixed(2)}B`
+: `${(x / 1e6).toFixed(0)}M`;
+
+const svg = d3.select("svg").attr("viewBox", [0, 0, width, height]);
 
 svg.append("g")
 .selectAll("g")
 .data(series)
 .join("g")
-.attr("fill", d => color(d.key))
-.selectAll("rect")
+.attr("fill", ({key}) => color(key))
+.call(g => g.selectAll("rect")
 .data(d => d)
 .join("rect")
-.attr("x", (d, i) => x(d.data.name))
+.attr("x", d => x(d.data.tickVal))
 .attr("y", d => y(d[1]))
+.attr("width", x.bandwidth() - 1)
 .attr("height", d => y(d[0]) - y(d[1]))
-.attr("width", x.bandwidth())
 .append("title")
-.text(d => `${d.data.name} ${d.key}
-${formatValue(d.data[d.key])}`);
+.text(d => `${d.data.name}: ${(d.data.value)} ${(d.data.name) == "Number of samples per bucket" ? "": "invocations"} are within approx. ${formatTicks(d.data.tickVal)}`));
 
 svg.append("g")
 .call(xAxis);
@@ -58,30 +162,5 @@ svg.append("g")
 svg.append("g")
 .call(yAxis);
 
-// add legend
-
-var sequentialScale = d3.schemeSpectral[series.length];
-
-svg.append("g")
-.attr("class", "legendSequential")
-.attr("transform", "translate(20,20)");
-
-// var legendSequential = legend.color
-//     .shapeWidth(30)
-//     .cells(10)
-//     .orient("horizontal")
-//     .scale(sequentialScale);
-
-svg.select(".legendSequential")
-.call(legend({
-color: d3.scaleSequential([0, 100], d3.interpolateViridis),
-title: "Temperature (°F)"
-}));
-
-// svg.node()
-legend({
-color: d3.scaleSequential([0, 100], d3.interpolateViridis),
-title: "Temperature (°F)"
-})
-
 </script>
+</html>

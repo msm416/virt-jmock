@@ -1,53 +1,126 @@
 var list = document.getElementById('distrList');
 
-for(i = 0; i < 5; i++) {
+for(i = 0; i < distributionInfo.length; i++) {
+
 var li = document.createElement('li');
+var container = document.createElement('div');
+var row = document.createElement('div');
+var col_1 = document.createElement('div');
+var col_2 = document.createElement('div');
 var entry = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-entry.setAttribute("width", "960");
+var par_name = document.createElement('P');
+var par_totalOver = document.createElement('P');
+var par_avgOver = document.createElement('P');
+var par_totalUnder = document.createElement('P');
+var par_avgUnder = document.createElement('P');
+var par_pval = document.createElement('P');
+
+container.setAttribute("class", "container");
+container.setAttribute("style", "margin-left: 0");
+row.setAttribute("class", "row");
+col_1.setAttribute("class", "col-md-auto");
+col_2.setAttribute("class", "col-md-auto");
+col_2.setAttribute("style", "border-style: groove;");
+entry.setAttribute("width", "2000");
 entry.setAttribute("height", "500");
 entry.id = "svg" + i;
-li.appendChild(entry);
+par_name.innerText = distributionInfo[i].name;
+par_name.setAttribute("style", "font-weight: bold");
+par_totalOver.setAttribute("style", "color:green;");
+par_totalOver.innerText = "Total Area Over: " + distributionInfo[i].totalOver;
+par_avgOver.setAttribute("style", "color:green;");
+par_avgOver.innerText = "Average (per bucket) Area Over: " + (distributionInfo[i].totalOver / nbOfBuckets);
+par_totalUnder.setAttribute("style", "color:red;");
+par_totalUnder.innerText = "Total Area Under: " + distributionInfo[i].totalUnder;
+par_avgUnder.setAttribute("style", "color:red;");
+par_avgUnder.innerText = "Average (per bucket) Area Under: " + (distributionInfo[i].totalUnder / nbOfBuckets);
+par_pval.setAttribute("style", "font-weight: bold");
+par_pval.innerText = "P value corresponding to Goodness To Fit test: " + distributionInfo[i].pval;
+
 list.appendChild(li);
+li.appendChild(container);
+container.appendChild(row);
+row.appendChild(col_1);
+row.appendChild(col_2);
+col_1.appendChild(entry);
+col_2.appendChild(par_name);
+col_2.appendChild(par_totalOver);
+col_2.appendChild(par_avgOver);
+col_2.appendChild(par_totalUnder);
+col_2.appendChild(par_avgUnder);
+col_2.appendChild(par_pval);
+<!--li.appendChild(entry);-->
+<!--list.appendChild(li);-->
 }
 
-var width = 960, height = 500;
+var colorsArray = ["green", "red", "blue"];
 
-for(j = 0; j < dataNested.length; j++) {
+var width = 2000, height = 500;
+
+var margin = ({top: 20, right: 30, bottom: 30, left: 30});
+
+for(j = 0; j < distributionInfo.length; j++) {
+
+var colors = new Map([
+["Over", colorsArray[0]],
+["Under", colorsArray[1]],
+[distributionInfo[j].name, colorsArray[2]]
+]);
+
+var color = d3.scaleOrdinal()
+.domain(Array.from(colors.keys()))
+.range(Array.from(colors.values()));
+
 var data = dataNested[j];
-var width = 960, height = 500;
 
-var margin = ({top: 10, right: 10, bottom: 20, left: 40});
+formatTicks = x => (x == xTickValuesNested[j][0])
+? ("<=" + x)
+: ((x == xTickValuesNested[j][nbOfBuckets - 1])
+? (">=" + x)
+: `${x + ""}`);
+
+formatTicksInArr = x => x.map(function(val, index){
+return val+1;
+})
 
 formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
 
-var series = d3.stack()
-.keys(columns)
-(data)
-.map(d => (d.forEach(v => v.key = d.key), d));
-
-var color = d3.scaleOrdinal()
-.domain(series.map(d => d.key))
-.range(["#0066ff","#00cc00","#ff0000"])
-.unknown("#ccc");
+series = d3.stack()
+.keys(Array.from(colors.keys()))
+.value((group, key) => group.get(key).value)
+.order(d3.stackOrderReverse)
+(Array.from(d3.rollup(data, ([d]) => d, d => d.tickVal, d => d.name).values()))
+.map(s => (s.forEach(d => d.data = d.data.get(s.key)), s));
 
 x = d3.scaleBand()
-.domain(data.map(d => d.name))
-.range([margin.left, width - margin.right])
-.padding(0.1);
+.domain(data.map(d => d.tickVal))
+.rangeRound([margin.left, width - margin.right]);
 
 y = d3.scaleLinear()
-.domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
-.rangeRound([height - margin.bottom, margin.top]);
+.domain([0, d3.max(series, d => d3.max(d, d => d[1]))]).nice()
+.range([height - margin.bottom, margin.top]);
 
 xAxis = g => g
 .attr("transform", `translate(0,${height - margin.bottom})`)
-.call(d3.axisBottom(x).tickSizeOuter(0))
-.call(g => g.selectAll(".domain").remove());
+.call(d3.axisBottom(x)
+.tickValues(xTickValuesNested[j])
+.tickFormat(formatTicks)
+.tickSizeOuter(0));
 
 yAxis = g => g
 .attr("transform", `translate(${margin.left},0)`)
-.call(d3.axisLeft(y).ticks(null, "s"))
-.call(g => g.selectAll(".domain").remove());
+.call(d3.axisLeft(y)
+.tickFormat(x => (x).toFixed(0)))
+.call(g => g.select(".domain").remove())
+.call(g => g.select(".tick:last-of-type text").clone()
+.attr("x", 3)
+.attr("text-anchor", "start")
+.attr("font-weight", "bold")
+.text(data.y));
+
+formatRevenue = x => (+(x / 1e9).toFixed(2) >= 1)
+? `${(x / 1e9).toFixed(2)}B`
+: `${(x / 1e6).toFixed(0)}M`;
 
 const svg = d3.select("#svg"+j).attr("viewBox", [0, 0, width, height]);
 
@@ -55,17 +128,16 @@ svg.append("g")
 .selectAll("g")
 .data(series)
 .join("g")
-.attr("fill", d => color(d.key))
-.selectAll("rect")
+.attr("fill", ({key}) => color(key))
+.call(g => g.selectAll("rect")
 .data(d => d)
 .join("rect")
-.attr("x", (d, i) => x(d.data.name))
+.attr("x", d => x(d.data.tickVal))
 .attr("y", d => y(d[1]))
+.attr("width", x.bandwidth() - 1)
 .attr("height", d => y(d[0]) - y(d[1]))
-.attr("width", x.bandwidth())
 .append("title")
-.text(d => `${d.data.name} ${d.key}
-${formatValue(d.data[d.key])}`);
+.text(d => `${d.data.name}: ${(d.data.value)} samples are approx. ${formatTicks(d.data.tickVal)}`));
 
 svg.append("g")
 .call(xAxis);
@@ -74,3 +146,4 @@ svg.append("g")
 .call(yAxis);
 }
 </script>
+</html>

@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title> Sensitivity Analysis</title>
+</head>
+<style>
+.bar rect { fill: steelblue; }
+.bar text { fill: #fff; font: 10px sans-serif; }
+</style>
+
+<svg width="2000" height="500"></svg>
+
+<div class="container" id="container" style="border-style: groove;">
+    <div class="row">
+        <div class="col-sm">
+            <div class="input-group">
+                <div class="input-group-append">
+                    <span class="input-group-text">Desired Total Time <=</span>
+                </div>
+                <input type="text" class="form-control" id="desiredTotalTime">
+                <div class="input-group-append">
+                    <span class="input-group-text">ms</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="input-group">
+                <div class="input-group-append">
+                    <span class="input-group-text">Confidence <=</span>
+                </div>
+                <input type="text" class="form-control" id="confidence" value="75">
+                <div class="input-group-append">
+                    <span class="input-group-text">%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm">
+            <button type="button" class="btn btn-outline-primary" onclick="computeImprovement();">Compute Improvement</button>
+        </div>
+    </div>
+</div>
+
+<script src="d3.min.js"></script>
+<script src="https://d3js.org/d3-array.v2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script>
+    function returnComputationMessage(outputColor, result) {
+        var outputP = document.getElementById("outputP");
+        outputP.setAttribute("style", outputColor + "; padding-left: 15px");
+        outputP.innerText = result;
+    }
+
+    function computeImprovement() {
+        var confidence = parseInt(document.getElementById("confidence").value);
+
+        if(!confidence || 0 >= confidence || 100 <= confidence) {
+            returnComputationMessage("color: red",
+                "Computation failed: confidence is not an integer strictly between 0 and 100.");
+            return
+        }
+
+        var desiredTotalTime = parseFloat(document.getElementById("desiredTotalTime").value);
+
+        if(!desiredTotalTime) {
+            returnComputationMessage("color: red",
+                "Computation failed: Desired Total Time is not a float.");
+            return
+        }
+
+        var currentExecutionTime = 0.0;
+
+        var currentExecutionTimeConstantComponents = 0.0;
+
+        for(i = 0; i < nbOfComponents; i++) {
+            var compName = componentNames[i];
+            var stringImprFactor = document.getElementById(compName).value;
+            var improvementFactor = parseFloat(stringImprFactor);
+            if(isNaN(improvementFactor) && stringImprFactor !== "") {
+                returnComputationMessage("color: red",
+                    "Computation has stopped: Improvement Factor is not float for " + compName);
+                return
+            }
+
+            if(stringImprFactor === "") {
+                improvementFactor = 1.0;
+            } else {
+                currentExecutionTimeConstantComponents +=
+                    percentilesPerComponent[compName][parseInt(confidence / 100 * nbOfBuckets)] / improvementFactor;
+            }
+
+            currentExecutionTime +=
+                percentilesPerComponent[compName][parseInt(confidence / 100 * nbOfBuckets)] / improvementFactor;
+        }
+
+        if(desiredTotalTime > currentExecutionTime) {
+            returnComputationMessage("color: blue",
+                "Computation has stopped: Desired Total Time is already larger than " + currentExecutionTime);
+            return
+        } else if (currentExecutionTimeConstantComponents === currentExecutionTime) {
+            returnComputationMessage("color: red",
+                "Computation failed: No component is available to be improved. ");
+            return
+        } else if (currentExecutionTimeConstantComponents >= desiredTotalTime) {
+            console.log(currentExecutionTimeConstantComponents);
+            returnComputationMessage("color: red",
+                "Computation failed: Selected components are not sufficient to improve the total time: "
+                +  currentExecutionTime);
+            return
+        }
+
+        var improvement = (currentExecutionTime - currentExecutionTimeConstantComponents) /
+            (desiredTotalTime- currentExecutionTimeConstantComponents);
+
+        for(i = 0; i < nbOfComponents; i++) {
+            var compName = componentNames[i];
+            var factorDivToBeChanged = document.getElementById(compName);
+            if(isNaN(parseFloat(document.getElementById(compName).value))) {
+                factorDivToBeChanged.value = improvement;
+            }
+        }
+
+        returnComputationMessage("color: green",
+            "Computation has finished!");
+    }
+</script>
+<script>
+var dataNested = [
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21327", "value":"4"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21327", "value":"2"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21327", "value":"1"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21327", "value":"1"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21329", "value":"0"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21329", "value":"0"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21329", "value":"0"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21329", "value":"0"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21332", "value":"16"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21332", "value":"8"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21332", "value":"4"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21332", "value":"4"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21335", "value":"0"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21335", "value":"0"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21335", "value":"0"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21335", "value":"0"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21338", "value":"4"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21338", "value":"2"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21338", "value":"1"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21338", "value":"1"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21341", "value":"8"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21341", "value":"4"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21341", "value":"2"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21341", "value":"2"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21344", "value":"12"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21344", "value":"6"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21344", "value":"3"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21344", "value":"3"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21347", "value":"16"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21347", "value":"8"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21347", "value":"4"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21347", "value":"4"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21350", "value":"16"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21350", "value":"8"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21350", "value":"4"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21350", "value":"4"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21352", "value":"36"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21352", "value":"18"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21352", "value":"9"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21352", "value":"9"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21355", "value":"24"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21355", "value":"12"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21355", "value":"6"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21355", "value":"6"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21358", "value":"36"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21358", "value":"18"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21358", "value":"9"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21358", "value":"9"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21361", "value":"44"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21361", "value":"22"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21361", "value":"11"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21361", "value":"11"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21364", "value":"64"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21364", "value":"32"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21364", "value":"16"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21364", "value":"16"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21367", "value":"100"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21367", "value":"50"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21367", "value":"25"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21367", "value":"25"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21370", "value":"84"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21370", "value":"42"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21370", "value":"21"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21370", "value":"21"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21373", "value":"88"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21373", "value":"44"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21373", "value":"22"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21373", "value":"22"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21375", "value":"96"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21375", "value":"48"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21375", "value":"24"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21375", "value":"24"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21378", "value":"140"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21378", "value":"70"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21378", "value":"35"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21378", "value":"35"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21381", "value":"128"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21381", "value":"64"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21381", "value":"32"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21381", "value":"32"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21384", "value":"180"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21384", "value":"90"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21384", "value":"45"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21384", "value":"45"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21387", "value":"208"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21387", "value":"104"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21387", "value":"52"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21387", "value":"52"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21390", "value":"196"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21390", "value":"98"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21390", "value":"49"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21390", "value":"49"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21393", "value":"212"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21393", "value":"106"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21393", "value":"53"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21393", "value":"53"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21395", "value":"156"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21395", "value":"78"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21395", "value":"39"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21395", "value":"39"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21398", "value":"140"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21398", "value":"70"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21398", "value":"35"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21398", "value":"35"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21401", "value":"208"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21401", "value":"104"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21401", "value":"52"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21401", "value":"52"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21404", "value":"208"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21404", "value":"104"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21404", "value":"52"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21404", "value":"52"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21407", "value":"176"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21407", "value":"88"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21407", "value":"44"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21407", "value":"44"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21410", "value":"204"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21410", "value":"102"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21410", "value":"51"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21410", "value":"51"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21413", "value":"128"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21413", "value":"64"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21413", "value":"32"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21413", "value":"32"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21416", "value":"196"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21416", "value":"98"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21416", "value":"49"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21416", "value":"49"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21418", "value":"140"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21418", "value":"70"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21418", "value":"35"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21418", "value":"35"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21421", "value":"108"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21421", "value":"54"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21421", "value":"27"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21421", "value":"27"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21424", "value":"124"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21424", "value":"62"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21424", "value":"31"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21424", "value":"31"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21427", "value":"112"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21427", "value":"56"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21427", "value":"28"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21427", "value":"28"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21430", "value":"60"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21430", "value":"30"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21430", "value":"15"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21430", "value":"15"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21433", "value":"60"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21433", "value":"30"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21433", "value":"15"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21433", "value":"15"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21436", "value":"32"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21436", "value":"16"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21436", "value":"8"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21436", "value":"8"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21439", "value":"72"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21439", "value":"36"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21439", "value":"18"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21439", "value":"18"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21441", "value":"40"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21441", "value":"20"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21441", "value":"10"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21441", "value":"10"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21444", "value":"24"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21444", "value":"12"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21444", "value":"6"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21444", "value":"6"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21447", "value":"36"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21447", "value":"18"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21447", "value":"9"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21447", "value":"9"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21450", "value":"12"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21450", "value":"6"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21450", "value":"3"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21450", "value":"3"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21453", "value":"16"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21453", "value":"8"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21453", "value":"4"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21453", "value":"4"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21456", "value":"20"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21456", "value":"10"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21456", "value":"5"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21456", "value":"5"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21459", "value":"8"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21459", "value":"4"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21459", "value":"2"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21459", "value":"2"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21462", "value":"0"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21462", "value":"0"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21462", "value":"0"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21462", "value":"0"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21464", "value":"4"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21464", "value":"2"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21464", "value":"1"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21464", "value":"1"
+},
+{
+"name":"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)", "tickVal":"21467", "value":"4"
+},
+{
+"name":"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)", "tickVal":"21467", "value":"2"
+},
+{
+"name":"public abstract java.util.List example.classes.SocialGraph.query(long)", "tickVal":"21467", "value":"1"
+},
+{
+"name":"Number of samples per bucket", "tickVal":"21467", "value":"1"
+},
+]
+var xTickValues = [
+"21327",
+"21329",
+"21332",
+"21335",
+"21338",
+"21341",
+"21344",
+"21347",
+"21350",
+"21352",
+"21355",
+"21358",
+"21361",
+"21364",
+"21367",
+"21370",
+"21373",
+"21375",
+"21378",
+"21381",
+"21384",
+"21387",
+"21390",
+"21393",
+"21395",
+"21398",
+"21401",
+"21404",
+"21407",
+"21410",
+"21413",
+"21416",
+"21418",
+"21421",
+"21424",
+"21427",
+"21430",
+"21433",
+"21436",
+"21439",
+"21441",
+"21444",
+"21447",
+"21450",
+"21453",
+"21456",
+"21459",
+"21462",
+"21464",
+"21467",
+];
+var nbOfBuckets = "50";
+var componentNames = [
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)",
+"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)",
+"public abstract java.util.List example.classes.SocialGraph.query(long)",
+];
+var percentilesPerComponent = {
+"public abstract example.classes.User example.classes.UserDetailsService.lookup(java.lang.Long)":[
+"324",
+"324",
+"347",
+"347",
+"362",
+"357",
+"354",
+"360",
+"366",
+"363",
+"362",
+"364",
+"365",
+"369",
+"374",
+"374",
+"379",
+"381",
+"381",
+"386",
+"387",
+"389",
+"391",
+"394",
+"398",
+"400",
+"400",
+"403",
+"401",
+"408",
+"410",
+"411",
+"413",
+"417",
+"417",
+"419",
+"426",
+"420",
+"430",
+"431",
+"427",
+"437",
+"441",
+"437",
+"441",
+"447",
+"454",
+"454",
+"443",
+"455",
+],
+"public abstract void example.classes.UserDetailsService.analyseUserID(java.lang.Long)":[
+"20000",
+"20000",
+"20000",
+"20000",
+"20001",
+"20000",
+"20001",
+"20000",
+"20001",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20000",
+"20001",
+"20000",
+"20001",
+],
+"public abstract java.util.List example.classes.SocialGraph.query(long)":[
+"1002",
+"1002",
+"985",
+"1002",
+"977",
+"985",
+"988",
+"986",
+"982",
+"989",
+"992",
+"994",
+"995",
+"994",
+"992",
+"995",
+"992",
+"994",
+"996",
+"995",
+"996",
+"997",
+"998",
+"998",
+"996",
+"997",
+"1000",
+"1000",
+"1005",
+"1001",
+"1001",
+"1004",
+"1004",
+"1004",
+"1006",
+"1007",
+"1003",
+"1012",
+"1004",
+"1007",
+"1013",
+"1006",
+"1005",
+"1012",
+"1011",
+"1008",
+"1006",
+"1013",
+"1021",
+"1010",
+],
+};
+var width = 2000, height = 500;
+
+var margin = ({top: 20, right: 30, bottom: 30, left: 30});
+
+var displayedComponents = componentNames.slice(0);
+displayedComponents.push("Number of samples per bucket");
+
+var nbOfComponents = componentNames.length;
+
+var nbOfDisplayedComponents = nbOfComponents + 1;
+
+var colorsArray;
+
+if(nbOfDisplayedComponents < 4) {
+colorsArray = ["yellow", "green", "orange", "blue"].slice(4 - nbOfDisplayedComponents);
+} else if (nbOfDisplayedComponents < 12) {
+colorsArray = d3.schemeSpectral[nbOfDisplayedComponents];
+} else {
+colorsArray = Array.from({length: nbOfDisplayedComponents},
+() => "#" + ('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6));
+}
+
+var colors = new Map(
+
+displayedComponents.map(function(e, i) {
+return [e, colorsArray[i]];
+})
+
+);
+
+var color = d3.scaleOrdinal()
+.domain(Array.from(colors.keys()))
+.range(Array.from(colors.values()));
+
+var container = document.getElementById("container");
+
+for(i = 0; i < nbOfComponents; i++) {
+// <div class="input-group-append">
+    //         <span class="input-group-text">%</span>
+    //         </div>
+var row_i = document.createElement("div");
+var col_i = document.createElement("div");
+var input_group_i = document.createElement("div");
+var input_group_i_append = document.createElement("div");
+var span_input_group_i_append = document.createElement("span");
+var input_i = document.createElement("input");
+var description_input_group_i_append = document.createElement("div");
+var span_description_input_group_i_append = document.createElement("span");
+
+row_i.setAttribute("class", "row");
+row_i.setAttribute("id", "comp" + i);
+col_i.setAttribute("class", "col-sm");
+input_group_i.setAttribute("class", "input-group");
+input_group_i_append.setAttribute("class", "input-group-append");
+span_input_group_i_append.setAttribute("class", "input-group-text");
+span_input_group_i_append.setAttribute("style", "color: " + colors.get(componentNames[i]));
+span_input_group_i_append.innerText = componentNames[i];
+input_i.setAttribute("type", "text");
+input_i.setAttribute("class", "form-control");
+input_i.setAttribute("id", "" + componentNames[i]);
+
+description_input_group_i_append.setAttribute("class", "input-group-append");
+span_description_input_group_i_append.setAttribute("class", "input-group-text");
+span_description_input_group_i_append.innerText = "% Improvement";
+
+
+container.appendChild(row_i);
+row_i.appendChild(col_i);
+col_i.appendChild(input_group_i);
+input_group_i.appendChild(input_group_i_append);
+input_group_i_append.appendChild(span_input_group_i_append);
+input_group_i.appendChild(input_i);
+
+description_input_group_i_append.appendChild(span_description_input_group_i_append);
+input_group_i.appendChild(description_input_group_i_append);
+}
+
+var outputP_row = document.createElement("div");
+outputP_row.setAttribute("class", "row");
+var outputP_par = document.createElement("p");
+outputP_par.setAttribute("id", "outputP");
+outputP_par.setAttribute("style", "color: black; padding-left: 15px;");
+outputP_par.innerText = "Computation result message is displayed here and if successful, improvement percentages are updated above.";
+
+outputP_row.appendChild(outputP_par);
+container.appendChild(outputP_row);
+
+// <div class="row">
+    //     <p id="outputP" style="color: black"> abcd </p>
+    //     </div>
+var data = dataNested;
+
+formatTicks = x => (x == xTickValues[0])
+? ("<=" + x)
+: ((x == xTickValues[nbOfBuckets - 1])
+? (">=" + x)
+: `${x + ""}`);
+
+formatTicksInArr = x => x.map(function(val, index){
+return val+1;
+})
+
+formatValue = x => isNaN(x) ? "N/A" : x.toLocaleString("en");
+
+series = d3.stack()
+.keys(Array.from(colors.keys()))
+.value((group, key) => group.get(key).value)
+.order(d3.stackOrderReverse)
+(Array.from(d3.rollup(data, ([d]) => d, d => d.tickVal, d => d.name).values()))
+.map(s => (s.forEach(d => d.data = d.data.get(s.key)), s));
+
+x = d3.scaleBand()
+.domain(data.map(d => d.tickVal))
+.rangeRound([margin.left, width - margin.right]);
+
+y = d3.scaleLinear()
+.domain([0, d3.max(series, d => d3.max(d, d => d[1]))]).nice()
+.range([height - margin.bottom, margin.top]);
+
+xAxis = g => g
+.attr("transform", `translate(0,${height - margin.bottom})`)
+.call(d3.axisBottom(x)
+.tickValues(xTickValues)
+.tickFormat(formatTicks)
+.tickSizeOuter(0));
+
+yAxis = g => g
+.attr("transform", `translate(${margin.left},0)`)
+.call(d3.axisLeft(y)
+.tickFormat(x => (x).toFixed(0)))
+.call(g => g.select(".domain").remove())
+.call(g => g.select(".tick:last-of-type text").clone()
+.attr("x", 3)
+.attr("text-anchor", "start")
+.attr("font-weight", "bold")
+.text(data.y));
+
+formatRevenue = x => (+(x / 1e9).toFixed(2) >= 1)
+? `${(x / 1e9).toFixed(2)}B`
+: `${(x / 1e6).toFixed(0)}M`;
+
+const svg = d3.select("svg").attr("viewBox", [0, 0, width, height]);
+
+svg.append("g")
+.selectAll("g")
+.data(series)
+.join("g")
+.attr("fill", ({key}) => color(key))
+.call(g => g.selectAll("rect")
+.data(d => d)
+.join("rect")
+.attr("x", d => x(d.data.tickVal))
+.attr("y", d => y(d[1]))
+.attr("width", x.bandwidth() - 1)
+.attr("height", d => y(d[0]) - y(d[1]))
+.append("title")
+.text(d => `${d.data.name}: ${(d.data.value)} ${(d.data.name) == "Number of samples per bucket" ? "": "invocations"} are within approx. ${formatTicks(d.data.tickVal)}`));
+
+svg.append("g")
+.call(xAxis);
+
+svg.append("g")
+.call(yAxis);
+
+</script>
+</html>

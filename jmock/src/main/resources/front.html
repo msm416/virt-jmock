@@ -1,4 +1,150 @@
-<!DOCTYPE html><meta charset="utf-8"><style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title> Sensitivity Analysis</title>
+</head>
+<style>
 .bar rect { fill: steelblue; }
 .bar text { fill: #fff; font: 10px sans-serif; }
-</style><svg width="960" height="500"></svg><script src="d3.min.js"></script><script>
+</style>
+
+<svg width="2000" height="500"></svg>
+
+<div class="container" id="container" style="border-style: groove;">
+    <br>
+    <div class="row justify-content-center" >
+        <div class="col-md-offset-3">
+            <button type="button" class="btn btn-outline-secondary" onclick="computeImprovement();">Compute Improvement</button>
+
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm">
+            <div class="input-group">
+                <div class="input-group-append">
+                    <span class="input-group-text">Desired Time <=</span>
+                </div>
+                <input type="text" class="form-control" id="desiredTotalTime">
+                <div class="input-group-append">
+                    <span class="input-group-text">ms</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="input-group">
+                <div class="input-group-append">
+                    <span class="input-group-text">Percentile </span>
+                </div>
+                <input type="text" class="form-control" id="confidence" value="75">
+                <div class="input-group-append">
+                    <span class="input-group-text">th</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="input-group">
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <input id="mode" type="checkbox" aria-label="Checkbox for following text input">
+                    </div>
+                </div>
+                <span class="input-group-text"> Aggressive Mode </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="d3.min.js"></script>
+<script src="https://d3js.org/d3-array.v2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script>
+    function returnComputationMessage(outputColor, result) {
+        var outputP = document.getElementById("outputP");
+        outputP.setAttribute("style", outputColor + "; padding-left: 15px");
+        outputP.innerText = result;
+    }
+
+    function computeImprovement() {
+        var mode = document.getElementById("mode").checked ? "aggressiveMode" : "normalMode";
+
+        var confidence = parseInt(document.getElementById("confidence").value);
+
+        if(!confidence || 0 >= confidence || 100 <= confidence) {
+            returnComputationMessage("color: red",
+                "Computation failed: confidence is not an integer strictly between 0 and 100.");
+            return
+        }
+
+        var desiredTotalTime = parseFloat(document.getElementById("desiredTotalTime").value);
+
+        if(!desiredTotalTime) {
+            returnComputationMessage("color: red",
+                "Computation failed: Desired Total Time is not a float.");
+            return
+        }
+
+        var currentExecutionTime = 0.0;
+
+        var currentExecutionTimeConstantComponents = 0.0;
+
+        for(i = 0; i < nbOfComponents; i++) {
+            var compName = componentNames[i];
+            var stringImprFactor = document.getElementById(compName).value;
+            var improvementFactor = parseFloat(stringImprFactor);
+            if(isNaN(improvementFactor) && stringImprFactor !== "") {
+                returnComputationMessage("color: red",
+                    "Computation has stopped: Improvement Factor is not float for " + compName);
+                return
+            }
+
+            if(stringImprFactor === "") {
+                improvementFactor = 1.0;
+            } else {
+                currentExecutionTimeConstantComponents +=
+                    percentilesPerComponent[compName][mode][parseInt(confidence)] / improvementFactor;
+            }
+
+            currentExecutionTime +=
+                percentilesPerComponent[compName][mode][parseInt(confidence)] / improvementFactor;
+        }
+
+        if(desiredTotalTime > currentExecutionTime) {
+            returnComputationMessage("color: blue",
+                "Computation has stopped: Desired Total Time is already larger than " + currentExecutionTime);
+            return
+        } else if (currentExecutionTimeConstantComponents === currentExecutionTime) {
+            returnComputationMessage("color: red",
+                "Computation failed: No component is available to be improved. ");
+            return
+        } else if (currentExecutionTimeConstantComponents >= desiredTotalTime) {
+            console.log(currentExecutionTimeConstantComponents);
+            returnComputationMessage("color: red",
+                "Computation failed: Selected components are not sufficient to improve the total time: "
+                +  currentExecutionTime);
+            return
+        }
+
+        var improvement = (currentExecutionTime - currentExecutionTimeConstantComponents) /
+            (desiredTotalTime- currentExecutionTimeConstantComponents);
+
+        for(i = 0; i < nbOfComponents; i++) {
+            var compName = componentNames[i];
+            var factorDivToBeChanged = document.getElementById(compName);
+            if(isNaN(parseFloat(document.getElementById(compName).value))) {
+                factorDivToBeChanged.value = improvement;
+            }
+        }
+
+        returnComputationMessage("color: green",
+            "Computation has finished!");
+    }
+</script>
+<script>

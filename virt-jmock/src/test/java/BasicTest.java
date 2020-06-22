@@ -11,6 +11,7 @@ import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertThat;
 
 import umontreal.ssj.probdist.NormalDist;
+import umontreal.ssj.probdist.UniformDist;
 
 public class BasicTest {
     static final long USER_ID = 1111L;
@@ -31,6 +32,10 @@ public class BasicTest {
             exactly(4).of(userDetails).lookup(with(any(Long.class)));
             will(returnValue(new User()));
             inTime(new NormalDist(100, 10));
+            exactly(2).of(userDetails).analyseUserID(with(any(Long.class)));
+            inTime(new UniformDist(10000,10001));
+            //withRemainingTime(new NormalDist(10000, 10));
+
         }});
 
         long startTime = System.currentTimeMillis();
@@ -40,6 +45,6 @@ public class BasicTest {
         assertThat(context.getSingleVirtualTime(true)
                         + (endTime - startTime)
                         - context.getSingleRealTime(),
-                lessThan(2000.0 + 2000));
+                lessThan(22000.0));
     }
 }

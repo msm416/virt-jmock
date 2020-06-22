@@ -23,35 +23,51 @@ public interface InvocationDispatcher extends SelfDescribing, ExpectationCollect
 
     Object dispatch(Invocation invocation) throws Throwable;
 
-    default double getSingleVirtualTime(boolean resetVirtualTime) {
-        return 0d;
+    default void setRepeatCounter(int repeatCounter){}
+
+    default int getRepeatCounter() {
+        return 1;
     }
 
-    default Map<String, List<Double>> getSingleVirtualTimePerComponent(boolean resetVirtualTime) {
-        return new HashMap<>();
+    default SingleContextIteration getSingleContextIteration(boolean resetSingleContextIteration) {
+        return new SingleContextIteration();
+    }
+
+    default void setSingleContextIteration(SingleContextIteration singleContextIteration) {
     }
 
     default double getSingleRealTime() {
         return 0d;
     }
 
-    default void setMultipleVirtualTimes(List<Double> virtualTimes) {
+    default void setMultipleSingleContextIterations(List<SingleContextIteration> multipleSingleContextIterations) {
     }
 
-    default void setMultipleVirtualTimesPerComponent(Map<String, List<Double>> virtualTimesPerComponent) {
+    default List<SingleContextIteration> getMultipleSingleContextIterations
+            (boolean resetMultipleSingleContextIterations) {
+        return new ArrayList<>();
     }
 
-    default List<Double> getMultipleVirtualTimes() {
-        return new ArrayList<>(0);
-    }
+    class SingleContextIteration {
+        public double totalVirtualTime;
 
-    default Map<String, List<Double>> getMultipleVirtualTimesPerComponent() {
-        return new HashMap<>();
-    }
+        public Map<String, List<Double>> virtualTimesPerComponent;
 
-    default void setRepeatCounter(int repeatCounter){}
+        public SingleContextIteration() {
+            this.totalVirtualTime = 0d;
+            virtualTimesPerComponent = new HashMap<>();
+        }
 
-    default int getRepeatCounter() {
-        return 1;
+        public void addComponent(String componentName, double time) {
+            if(virtualTimesPerComponent.containsKey(componentName)) {
+                List<Double> virtualTimes = virtualTimesPerComponent.get(componentName);
+                virtualTimes.add(time);
+                //virtualTimesPerComponent.put(componentName, virtualTimes);
+            } else {
+                virtualTimesPerComponent.put(componentName, new ArrayList(){{add(time);}});
+            }
+
+            totalVirtualTime += time;
+        }
     }
 }

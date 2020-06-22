@@ -25,7 +25,45 @@ import java.util.stream.Collectors;
 
 public class LogsAndDistr {
     public static void main(String[] args) {
-//        createLogFile();
+//        try {
+//            getBestDistributionFromEmpiricalData(
+//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                            "lookupMealIngredients", 0d),
+//                    "lookupMealIngredientsDist");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        Distribution lookupIngredientNutritionDistr = getDiscreteDistribution(
+                getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+                        "lookupIngredientNutrition",
+                        0.2));
+
+        double adjFactor = computeAdjustmentFactor(
+
+
+                new SequentialCallsDist(new UniformIntDist(1, 5), lookupIngredientNutritionDistr),
+
+                    getDiscreteDistribution(
+                        getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+                                "lookupIngredientNutritionCombinedParallel",
+                                0.2)));
+//
+        System.out.println(adjFactor);
+
+//        double adjFactor = computeAdjustmentFactor(
+//
+//
+//                getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                        "lookupIngredientNutritionCombinedSequential",
+//                        0.2),
+//                //new SequentialCallsDist(new UniformIntDist(1, 5), lookupIngredientNutritionDistr),
+//
+//
+//                getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                        "lookupIngredientNutritionCombinedParallel",
+//                        0.2),
+//                0.8);
 
 //        try {
 //            runForSomeTimeAndGenerateLogsOnHeroku();
@@ -40,17 +78,46 @@ public class LogsAndDistr {
 
 //        System.out.println(System.currentTimeMillis() - start);
 
-        try {
-            getBestDistributionFromEmpiricalData(
-                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
-                            "lookupOnApiIngredientDetails"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            getBestDistributionFromEmpiricalData(
+//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                            "lookupOnApiIngredientDetails"), "dist1");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+//        try {
+//            Distribution oldDistr = getBestDistributionFromEmpiricalData(
+//                        getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                                "lookupIngredientNutritionCombined"), "dist1");
+//            Distribution newDistr = getBestDistributionFromEmpiricalData(
+//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                            "lookupIngredientNutritionCombinedParallel"), "dist2");
+//
+//            System.out.println("Adjustment factor: " + getAdjustmentFactor(oldDistr, newDistr));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+//        try {
+//            runForSomeTimeAndGenerateLogsOnHeroku();
+//        } catch (InterruptedException | UnirestException | UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+
+//        try {
+//            getBestDistributionFromEmpiricalData(
+//                    getSamplesFromLog("jmock/src/main/java/org/jmock/utils/logs.txt",
+//                            "lookupMealIngredients", 0.3), "lookupMealIngredientsDist");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        //getDiscreteDistribution(new double[]{2, 3, 3, 4 , 4, 5});
     }
 
     private static void writeDistributionSummaryHTML(List<ContinuousDistribution> distributionList,
-                                                     double[] dataArray) {
+                                                     double[] dataArray, double[][] pval, String nameToAppend) {
         List<String> frontLines = new ArrayList<>();
 
         Class mockeryClass = Mockery.class;
@@ -58,11 +125,11 @@ public class LogsAndDistr {
         try {
             Path filePath = LogsAndDistr.writeFrontSectionHTML(
                     frontLines,
-                    "abcd.html",
+                    "DistributionComparison-" + nameToAppend + ".html",
                     "/frontDistr.html",
                     mockeryClass);
 
-            LogsAndDistr.writeMidSection(frontLines, distributionList, dataArray);
+            LogsAndDistr.writeMidSection(frontLines, distributionList, dataArray, pval);
 
             Files.write(filePath, frontLines);
 
@@ -73,61 +140,143 @@ public class LogsAndDistr {
     }
 
     private static void writeMidSection(List<String> frontLines, List<ContinuousDistribution> distributionList,
-                                        double[] dataArray) {
-        //TODO: make buckets
-        assert(dataArray.length >= 50);
-        //dataArray = Arrays.copyOfRange(dataArray, 0, 50);
-        int nbOfBuckets = 50;
-        int bucketSize = dataArray.length / 50;
+                                        double[] dataArray, double[][] pval) {
+        int n = dataArray.length;
+
+        int nbOfBuckets = Math.min(50, n);
+
+        double[] totalOver = new double[n];
+        double[] totalUnder = new double[n];
+
+        int[] xTickValues = new int[nbOfBuckets];
+
+        int[][] xTickValuesNested = new int[distributionList.size()][nbOfBuckets];
 
         frontLines.add("var dataNested = [");
 
         for (int i = 0; i < distributionList.size(); i++) {
             ContinuousDistribution distribution = distributionList.get(i);
-            List<Double> samplesFromDistr = new ArrayList<>();
-            List<Double> over = new ArrayList<>();
-            List<Double> under = new ArrayList<>();
-            for (int j = 0; j < nbOfBuckets; j++) {
-                double sample = 0.0;
-                double dataArrayInBucket = 0.0;
-                for(int k = bucketSize * j; k < bucketSize * (j + 1); k++) {
-                    dataArrayInBucket += dataArray[k];
-                    sample += distribution.inverseF(Math.random());
-                }
+            double[] samplesFromDistr = new double[n];
 
-                sample /= bucketSize;
-                dataArrayInBucket /= bucketSize;
-
-                double diff = sample - dataArrayInBucket;
-                if (diff > 0) {
-                    over.add(diff);
-                    under.add(0.0);
-                    sample -= diff;
-                } else {
-                    over.add(0.0);
-                    under.add(-diff);
-                }
-                if (sample < 0.0) {
-                    System.out.println("Distribution " + distribution + " generated negative sample.");
-                    sample = 0.0;
-                }
-                samplesFromDistr.add(sample);
+            for (int j = 0; j < n; j++) {
+                samplesFromDistr[j] = distribution.inverseF(Math.random());
             }
+
+            Arrays.sort(samplesFromDistr);
+
+            int[] dataArrayYValues = new int[nbOfBuckets];
+            int[] distributionYValues = new int[nbOfBuckets];
+
+            double minVal = Math.max(Math.min(dataArray[n/10], samplesFromDistr[n/10]), 0);
+            double maxVal = Math.max(dataArray[n * 9 / 10], samplesFromDistr[n * 9 / 10]);
+
+            if(maxVal - minVal < 50) {
+                maxVal += 50;
+                System.out.println("Adjusting tickvalues...");
+                //ensure that the distance between tickValues is >1.
+            }
+
+            System.out.println(minVal + " minval and " + maxVal + " maxval.");
+
+            xTickValues[0] = (int) minVal;
+            xTickValues[nbOfBuckets - 1] = (int) maxVal;
+
+            xTickValuesNested[i][0] = (int) minVal;
+            xTickValuesNested[i][nbOfBuckets - 1] = (int) maxVal;
+
+            double tickDistance = (maxVal - minVal) * (1.0 / (nbOfBuckets - 1));
+
+            for (int j = 1; j < nbOfBuckets - 1; j++) {
+                xTickValues[j] = (int) (minVal + (maxVal - minVal) * ((double) j / (nbOfBuckets - 1)));
+                xTickValuesNested[i][j] = xTickValues[j];
+            }
+
+            for (int j = 0; j < n; j++) {
+
+                determineBucketCounts(nbOfBuckets, dataArray[j], dataArrayYValues, minVal, tickDistance, 1);
+
+                determineBucketCounts(nbOfBuckets, samplesFromDistr[j], distributionYValues, minVal, tickDistance, 1);
+            }
+
             frontLines.add("[");
             for (int j = 0; j < nbOfBuckets; j++) {
+                int dataArrayYValue = dataArrayYValues[j];
+                int distributionYValue = distributionYValues[j];
+
+                int overValue, underValue, diff;
+                diff = distributionYValue - dataArrayYValue;
+
+                if (diff > 0) {
+                    overValue = diff;
+                    underValue = 0;
+                    distributionYValue -= diff;
+
+                    totalOver[i] += diff * xTickValues[j];
+                } else {
+                    overValue = 0;
+                    underValue = -diff;
+
+                    totalUnder[i] -= diff * xTickValues[j];
+                }
+
                 frontLines.add("{");
-                frontLines.add("\"distribution\":\"" + samplesFromDistr.get(j) + "\",");
-                frontLines.add("\"over\":\"" + over.get(j) + "\",");
-                frontLines.add("\"under\":\"" + under.get(j) + "\",");
-                frontLines.add("name:\"bucket" + j + "\"");
+                frontLines.add("\"name\":\"" + distribution.toString() +
+                        "\", \"tickVal\":\"" + xTickValues[j] +
+                        "\", \"value\":\"" + distributionYValue + "\"");
+                frontLines.add("},");
+                frontLines.add("{");
+                frontLines.add("\"name\":\"Over" +
+                        "\", \"tickVal\":\"" + xTickValues[j] +
+                        "\", \"value\":\"" + overValue + "\"");
+                frontLines.add("},");
+                frontLines.add("{");
+                frontLines.add("\"name\":\"Under" +
+                        "\", \"tickVal\":\"" + xTickValues[j] +
+                        "\", \"value\":\"" + underValue + "\"");
                 frontLines.add("},");
             }
             frontLines.add("],");
         }
-
         frontLines.add("];");
 
-        frontLines.add("var columns = [\"distribution\", \"over\", \"under\"];");
+        frontLines.add("var xTickValuesNested = [");
+        for (int i = 0; i < distributionList.size(); i++) {
+            frontLines.add("[");
+            for (int j = 0; j < nbOfBuckets; j++) {
+                frontLines.add("\"" + xTickValuesNested[i][j] + "\", ");
+            }
+            frontLines.add("],");
+        }
+        frontLines.add("];");
+
+        frontLines.add("var distributionInfo = [");
+        for (int i = 0; i < distributionList.size(); i++) {
+            frontLines.add("{");
+            frontLines.add("name:\"" + distributionList.get(i).toString() + "\"");
+            frontLines.add(",\"totalOver\":\"" + totalOver[i] + "\"");
+            frontLines.add(",\"totalUnder\":\"" + totalUnder[i] + "\"");
+            frontLines.add(",\"totalDiff\":\"" + (totalOver[i] - totalUnder[i]) + "\"");
+            frontLines.add(",\"pval\":\"" + pval[i][2] + "\"");
+            frontLines.add("},");
+        }
+        frontLines.add("];");
+
+        frontLines.add("var nbOfBuckets = \"" + nbOfBuckets + "\";");
+    }
+
+    public static void determineBucketCounts(int nbOfBuckets, double sample,
+                                              int[] distributionYValues, double minVal,
+                                             double tickDistance, int count) {
+
+        int bucketForSample = (int) ((sample - minVal) / tickDistance);
+
+        if (bucketForSample < 0) {
+            distributionYValues[0] += count;
+        } else if (bucketForSample > nbOfBuckets - 1) {
+            distributionYValues[nbOfBuckets - 1] += count;
+        } else {
+            distributionYValues[bucketForSample] += count;
+        }
     }
 
     public static void runForSomeTimeAndGenerateLogsOnHeroku() throws InterruptedException,
@@ -142,7 +291,7 @@ public class LogsAndDistr {
                 System.out.println(response);
                 Thread.sleep(2000);
                 response = Unirest.get("https://mmorpg-perf.herokuapp.com/?t=" +
-                        i + 1)
+                        (i + 1))
                         .asString();
                 System.out.println(response);
                 Thread.sleep(2000);
@@ -151,66 +300,9 @@ public class LogsAndDistr {
         }
     }
 
-    public static void createLogFile() {
-        try {
-            Process process = Runtime.getRuntime().exec("heroku logs -n 1500");
+    public static double[] getSamplesFromLog(String logfile, String methodName, double excludedPercentiles) {
+        assert (excludedPercentiles >= 0d && excludedPercentiles <= 1d);
 
-            StringBuilder output = new StringBuilder();
-
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line + "\n");
-            }
-
-            int exitVal = process.waitFor();
-            if (exitVal == 0) {
-                Map<String, ArrayList<Integer>> methodToExecTimes = new HashMap<>();
-                Pattern pattern = Pattern.compile("EXECTIME\\(ms\\)\\sfor\\s(?<method>.*\\(\\))\\s=\\s(?<time>\\d+)");
-                Matcher matcher = pattern.matcher(output);
-                while (matcher.find()) {
-                    String method = matcher.group("method");
-                    Integer execTime = Integer.parseInt(matcher.group("time"));
-                    if (methodToExecTimes.containsKey(method)) {
-                        methodToExecTimes.get(method).add(execTime);
-                    } else {
-                        methodToExecTimes.put(method, new ArrayList() {{
-                            add(execTime);
-                        }});
-                    }
-                }
-                File logs = new File("logs.txt");
-                if (logs.createNewFile()) {
-                    System.out.println("Log file created: " + logs.getName());
-                } else {
-                    System.out.println("Log file already exists. Will proceed to overwrite it.");
-                }
-                FileWriter myWriter = new FileWriter(logs.getName());
-                for (Map.Entry<String, ArrayList<Integer>> entry : methodToExecTimes.entrySet()) {
-                    myWriter.write(entry.getKey() + ":" + "[");
-                    ArrayList<Integer> execTimes = entry.getValue();
-                    int i;
-                    for (i = 0; i < execTimes.size() - 1; i++) {
-                        myWriter.write(execTimes.get(i) + ",");
-                    }
-                    myWriter.write(execTimes.get(i) + "");
-                    myWriter.write("]\n");
-                }
-                //System.out.println(output);
-                myWriter.close();
-                System.out.println("SUCCESFULLY GENNERATED LOG FILES.");
-                System.exit(0);
-            } else {
-                System.out.println("SOMETHING BAD HAPPENED");
-            }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static ArrayList<Double> getSamplesFromLog(String logfile, String methodName) {
         ArrayList<Double> samples = new ArrayList<>();
         String logfileContent = null;
         try {
@@ -229,25 +321,34 @@ public class LogsAndDistr {
                 samples.add(Double.parseDouble(part));
             }
         }
-        return samples;
+
+        double[] samplesArray = samples.stream().mapToDouble(Double::doubleValue).toArray();
+
+        int length = samplesArray.length;
+
+        samplesArray = Arrays.copyOfRange(samplesArray,
+                (int) (length * excludedPercentiles) ,
+                (int) (length * (1d - excludedPercentiles)));
+
+        Arrays.sort(samplesArray);
+
+        return samplesArray;
     }
 
-    public static Distribution getBestDistributionFromEmpiricalData(ArrayList<Double> data) throws Exception {
+    public static Distribution getBestDistributionFromEmpiricalData(double[] data, String nameToAppend) throws Exception {
         Class[] distClasses = {NormalDist.class, LaplaceDist.class, UniformDist.class};
-        return getBestDistributionFromEmpiricalData(data, distClasses);
+        return getBestDistributionFromEmpiricalData(data, nameToAppend, distClasses);
     }
 
     // This method is based on Kolmogorov Smirnov test, but any other could work
-    // TODO: make this method support non-cont distr.
-    public static Distribution getBestDistributionFromEmpiricalData(ArrayList<Double> data,
+    // TODO FUTURE WORK: extend this method to support discrete distr.
+    public static Distribution getBestDistributionFromEmpiricalData(double[] data, String nameToAppend,
                                                                     Class[] distributionClasses)
             throws Exception {
 
-        double[] dataArray = data.stream().mapToDouble(Double::doubleValue).toArray();
+        List<ContinuousDistribution> distributionList = getBestInstancesFromDistList(distributionClasses, data);
 
-        List<ContinuousDistribution> distributionList = getBestInstancesFromDistList(distributionClasses, dataArray);
-
-        return getBestDistributionViaGoodnessToFitTest(dataArray, distributionList, false);
+        return getBestDistributionViaGoodnessToFitTest(data, distributionList, false, nameToAppend);
     }
 
     private static List<ContinuousDistribution> getBestInstancesFromDistList(Class[] distributionClasses, double[] dataArray) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -267,7 +368,7 @@ public class LogsAndDistr {
 
     public static Distribution getBestDistributionViaGoodnessToFitTest(double[] dataArray,
                                                                        List<ContinuousDistribution> distributionList,
-                                                                       boolean isFindingBestMixtureDistr) {
+                                                                       boolean isFindingBestMixtureDistr, String nameToAppend) {
         int distributionListLen = distributionList.size();
         double[][] sval = new double[distributionList.size()][3];
         double[][] pval = new double[distributionList.size()][3];
@@ -284,8 +385,10 @@ public class LogsAndDistr {
         }
 
         if (!isFindingBestMixtureDistr) {
-            writeDistributionSummaryHTML(distributionList, dataArray);
+            System.out.println("Best distribution is: " + distributionList.get(maxPvalIndex));
+            writeDistributionSummaryHTML(distributionList, dataArray,  pval, nameToAppend);
         }
+
         return distributionList.get(maxPvalIndex);
     }
 
@@ -313,5 +416,72 @@ public class LogsAndDistr {
         BufferedReader brFront = new BufferedReader(new InputStreamReader(thisClass.getResourceAsStream(sectionPath)));
         frontLines.addAll(brFront.lines().collect(Collectors.toList()));
         return filePath;
+    }
+
+    public static double computeAdjustmentFactor(Distribution oldDistr, Distribution newDist) {
+        List<Double> oldSamples = new ArrayList<>();
+        List<Double> newSamples = new ArrayList<>();
+
+        for(int i = 0; i < 1000; i++) {
+            if(oldDistr instanceof SequentialCallsDist) {
+                oldSamples.add(Math.max(((SequentialCallsDist) oldDistr).getSample(), 0));
+            } else {
+                oldSamples.add(Math.max(oldDistr.inverseF(Math.random()), 0));
+            }
+            newSamples.add(Math.max(newDist.inverseF(Math.random()),0));
+        }
+
+        Collections.sort(oldSamples);
+        Collections.sort(newSamples);
+
+        if(newSamples.get(800) == 0) {
+            return 999999;
+        }
+
+        // return 80th percentile
+        return oldSamples.get(800) / newSamples.get(800);
+    }
+
+    public static double computeAdjustmentFactor(double[] oldDistrSamples,
+                                                 double[]  newDistrSamples,
+                                                 double percentile) {
+
+        assert (0d <= percentile && percentile <= 1d);
+
+        double oldSampleAtPerc = oldDistrSamples[(int)((oldDistrSamples.length-1) * percentile)];
+        double newSampleAtPerc = newDistrSamples[(int)((newDistrSamples.length-1) * percentile)];
+
+        if(oldSampleAtPerc == 0) {
+            return 999999;
+        }
+        return oldSampleAtPerc / newSampleAtPerc;
+    }
+
+    public static Distribution getDiscreteDistribution(double[] samples) {
+        //PRE: samples are ordered and positive
+        //POST: return a discrete distribution from samples
+
+        int n = samples.length;
+
+        int index = -1;
+
+        double prevVal = -1;
+
+        double[] prob = new double[n];
+
+        double[] newSamples = new double[n];
+
+        for(int i = 0; i < n; i++) {
+            if(prevVal != samples[i]) {
+                index++;
+                newSamples[index] = samples[i];
+            }
+
+            prob[index] += 1d/n;
+
+            prevVal = samples[i];
+        }
+
+        return new DiscreteDistribution(newSamples, prob, index + 1);
     }
 }
