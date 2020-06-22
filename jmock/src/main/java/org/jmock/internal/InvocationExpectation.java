@@ -37,6 +37,8 @@ public class InvocationExpectation implements Expectation {
 
 	private Distribution model;
 
+    private Distribution remainingTimeModel;
+
 	private double adjustmentFactor = 1d;
 	
     public void setCardinality(Cardinality cardinality) {
@@ -83,12 +85,20 @@ public class InvocationExpectation implements Expectation {
         this.model = model;
     }
 
+    public void setRemainingTimeModel(Distribution model) {
+        this.remainingTimeModel = model;
+    }
+
     public void setAdjustmentFactor(double adjustmentFactor) {
         this.adjustmentFactor = adjustmentFactor;
     }
 
     public Distribution getPerformanceModel() {
         return model;
+    }
+
+    public Distribution getRemainingTimeModel() {
+        return remainingTimeModel;
     }
 
     public double getAdjustmentFactor() {return adjustmentFactor;}

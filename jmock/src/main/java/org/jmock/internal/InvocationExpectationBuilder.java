@@ -61,6 +61,11 @@ public class InvocationExpectationBuilder
         expectation.setPerformanceModel(distribution);
     }
 
+    public void setRemainingTimeModel(Distribution distribution) {
+        expectation.setRemainingTimeModel(distribution);
+    }
+
+
     public void setAdjustmentFactor(double adjustmentFactor) {
         expectation.setAdjustmentFactor(adjustmentFactor);
     }

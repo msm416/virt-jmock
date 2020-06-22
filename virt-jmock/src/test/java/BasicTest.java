@@ -34,6 +34,8 @@ public class BasicTest {
             inTime(new NormalDist(100, 10));
             exactly(2).of(userDetails).analyseUserID(with(any(Long.class)));
             inTime(new UniformDist(10000,10001));
+            //withRemainingTime(new NormalDist(10000, 10));
+
         }});
 
         long startTime = System.currentTimeMillis();

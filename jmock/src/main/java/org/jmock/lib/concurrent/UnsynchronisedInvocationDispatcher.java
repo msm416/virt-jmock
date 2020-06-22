@@ -132,6 +132,17 @@ public class UnsynchronisedInvocationDispatcher implements InvocationDispatcher 
 
                         //System.out.println("WE SAMPLED: " + sample);
                     }
+
+                    if(invocationExpectation.getRemainingTimeModel() != null) {
+                        // No methods can have '#' as a starting character in their name
+                        String name = "#ConstantRemainingTime";
+                        if(!singleContextIteration.virtualTimesPerComponent.containsKey(name)) {
+                            double constantRemTimeSample = Math.max(0d,
+                                    invocationExpectation.getRemainingTimeModel().inverseF(Math.random()));
+
+                            singleContextIteration.addComponent(name, constantRemTimeSample);
+                        }
+                    }
                 } catch (Exception ignored) {
                     // TODO FUTURE WORK: don't throw exception, rather verify the cast above
                 }
